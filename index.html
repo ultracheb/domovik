@@ -80,101 +80,168 @@ dialog h2{margin:0;font-size:18px}
 .empty{text-align:center;color:var(--muted);padding:40px 0}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.on{opacity:1}
+.lang{display:flex;gap:2px;background:var(--chip);border-radius:8px;padding:2px}.lang button{border:0;background:none;padding:3px 7px;border-radius:6px;font-size:12px;color:var(--muted)}.lang button.on{background:var(--card);color:var(--ink);font-weight:700}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>🏠 Дамавік</h1>
+    <h1>🏠 <span id="appName">Дамавік</span></h1>
     <span class="sync" id="syncState"></span>
+    <div class="lang"><button data-lang="be">BE</button><button data-lang="uk">UK</button></div>
   </header>
   <div class="tabs">
-    <button data-tab="tasks" class="on">Справы</button>
-    <button data-tab="balance">Баланс</button>
-    <button data-tab="settings">Налады</button>
+    <button data-tab="tasks" class="on"></button>
+    <button data-tab="balance"></button>
+    <button data-tab="settings"></button>
   </div>
   <section id="tab-tasks"></section>
   <section id="tab-balance" hidden></section>
   <section id="tab-settings" hidden></section>
 </div>
-<button class="fab" id="addBtn" title="Дадаць справу">+</button>
+<button class="fab" id="addBtn">+</button>
 <div class="toast" id="toast"></div>
 
 <dialog id="dlg"><form method="dialog" id="form"></form></dialog>
 
 <script>
-const FREQ = {
-  daily:{l:'Штодня',days:1,w:7},
-  every3:{l:'Раз на 2-3 дні',days:3,w:2.5},
-  weekly:{l:'Штотыдзень',days:7,w:1},
-  biweekly:{l:'Раз на 2 тыдні',days:14,w:.5},
-  monthly:{l:'Штомесяц',days:30,w:.25},
-  asneeded:{l:'Па патрэбе',days:0,w:.5}
+/* ---------- i18n ---------- */
+const I18N={
+be:{
+  app:'Дамавік',
+  f_daily:'Штодня',f_every3:'Раз на 2-3 дні',f_weekly:'Штотыдзень',f_biweekly:'Раз на 2 тыдні',f_monthly:'Штомесяц',f_asneeded:'Па патрэбе',
+  tab_tasks:'Справы',tab_balance:'Баланс',tab_settings:'Налады',
+  all:'Усе',both:'Разам',rotate:'Па чарзе',todo:'🔥 Трэба зрабіць',byZone:'Па зонах',byDue:'Па тэрміне',
+  lastTime:'апошні раз {x}',asNeeded:'па патрэбе',never:'яшчэ не рабілі',overdue:'пратэрмінавана {n} дн.',today:'сёння',tomorrow:'заўтра',inDays:'праз {n} дн.',yesterday:'учора',daysAgo:'{n} дн. таму',
+  empty:'Тут пуста. Можна адпачыць 🙂',markDone:'Зроблена',changeOwner:'Змяніць адказнага',edit:'Рэдагаваць',add:'Дадаць справу',
+  planned:'Плануемая нагрузка',plannedHint:'Лічыцца як частата × цяжкасць. "Разам" і "па чарзе" дзеляцца напалову. Сваіх спраў: {a} {na}, {b} {nb}, агульных {n}.',
+  done7:'Рэальна зроблена за 7 дзён',done30:'За 30 дзён',nothingYet:'Пакуль нічога не адзначана.',history:'Гісторыя',deleted:'(выдалена)',emptyShort:'Пуста',
+  us:'Мы',whoMe:'Хто карыстаецца гэтай прыладай (каму залічваць ✓)',language:'Мова',zones:'Зоны',zonesHint:'Адна зона на радок, эмодзі на пачатку па жаданні.',saveZones:'Захаваць зоны',
+  syncTitle:'Сінхранізацыя праз GitHub Gist',tokenLbl:'GitHub token (толькі права gist)',gistPh:'пуста = стварыць новы',gistSave:'Захаваць у gist',gistCreate:'Стварыць gist',gistLoad:'Загрузіць з gist',
+  syncHint:'Пасля налады змены захоўваюцца аўтаматычна, а пры адкрыцці старонка падцягвае свежую версію. Другі чалавек уводзіць той жа token і Gist ID.',
+  other:'Іншае',theme:'Тэма',auto:'Аўта',light:'Светлая',dark:'Цёмная',exp:'Экспарт JSON',imp:'Імпарт JSON',reset:'Скінуць усё',
+  newTask:'Новая справа',what:'Што трэба рабіць',whatPh:'Напр. памыць вокны',zone:'Зона',who:'Хто адказвае',often:'Як часта',hard:'Наколькі цяжка',e1:'● Лёгка',e2:'●● Сярэдне',e3:'●●● Цяжка',
+  note:'Нататка',notePh:'Па жаданні',del:'Выдаліць',cancel:'Адмена',save:'Захаваць',delQ:'Выдаліць справу?',
+  wellDone:'Малайчына, {x}!',zonesSaved:'Зоны захаваныя',imported:'Імпартавана',badFile:'Не атрымалася прачытаць файл',resetQ:'Скінуць усе справы і гісторыю да пачатковых?',
+  needToken:'Увядзі token',savedGist:'Захавана ў gist',gistErr:'Памылка gist: ',noFile:'няма файла',loaded:'Загружана',synced:'✓ сінхранізавана',noSync:'⚠ няма сінхры',
+  defB:'Яна'
+},
+uk:{
+  app:'Домовик',
+  f_daily:'Щодня',f_every3:'Раз на 2-3 дні',f_weekly:'Щотижня',f_biweekly:'Раз на 2 тижні',f_monthly:'Щомісяця',f_asneeded:'За потреби',
+  tab_tasks:'Справи',tab_balance:'Баланс',tab_settings:'Налаштування',
+  all:'Усі',both:'Разом',rotate:'По черзі',todo:'🔥 Треба зробити',byZone:'За зонами',byDue:'За терміном',
+  lastTime:'востаннє {x}',asNeeded:'за потреби',never:'ще не робили',overdue:'прострочено на {n} дн.',today:'сьогодні',tomorrow:'завтра',inDays:'через {n} дн.',yesterday:'вчора',daysAgo:'{n} дн. тому',
+  empty:'Тут порожньо. Можна відпочити 🙂',markDone:'Зроблено',changeOwner:'Змінити відповідального',edit:'Редагувати',add:'Додати справу',
+  planned:'Заплановане навантаження',plannedHint:'Рахується як частота × складність. "Разом" і "по черзі" діляться навпіл. Своїх справ: {a} {na}, {b} {nb}, спільних {n}.',
+  done7:'Реально зроблено за 7 днів',done30:'За 30 днів',nothingYet:'Поки нічого не відмічено.',history:'Історія',deleted:'(видалено)',emptyShort:'Порожньо',
+  us:'Ми',whoMe:'Хто користується цим пристроєм (кому зараховувати ✓)',language:'Мова',zones:'Зони',zonesHint:'Одна зона на рядок, емодзі на початку за бажанням.',saveZones:'Зберегти зони',
+  syncTitle:'Синхронізація через GitHub Gist',tokenLbl:'GitHub token (лише право gist)',gistPh:'порожньо = створити новий',gistSave:'Зберегти в gist',gistCreate:'Створити gist',gistLoad:'Завантажити з gist',
+  syncHint:'Після налаштування зміни зберігаються автоматично, а при відкритті сторінка підтягує свіжу версію. Друга людина вводить той самий token і Gist ID.',
+  other:'Інше',theme:'Тема',auto:'Авто',light:'Світла',dark:'Темна',exp:'Експорт JSON',imp:'Імпорт JSON',reset:'Скинути все',
+  newTask:'Нова справа',what:'Що треба зробити',whatPh:'Напр. помити вікна',zone:'Зона',who:'Хто відповідає',often:'Як часто',hard:'Наскільки важко',e1:'● Легко',e2:'●● Середньо',e3:'●●● Важко',
+  note:'Нотатка',notePh:'За бажанням',del:'Видалити',cancel:'Скасувати',save:'Зберегти',delQ:'Видалити справу?',
+  wellDone:'Молодець, {x}!',zonesSaved:'Зони збережено',imported:'Імпортовано',badFile:'Не вдалося прочитати файл',resetQ:'Скинути всі справи та історію до початкових?',
+  needToken:'Введи token',savedGist:'Збережено в gist',gistErr:'Помилка gist: ',noFile:'немає файлу',loaded:'Завантажено',synced:'✓ синхронізовано',noSync:'⚠ немає синхронізації',
+  defB:'Вона'
+}};
+/* seed zones & tasks in both languages; untouched seed items follow the current language */
+const SEED_ZONES={
+  kitchen:{be:'🍳 Кухня',uk:'🍳 Кухня'},bath:{be:'🛁 Ванная',uk:'🛁 Ванна'},rooms:{be:'🛋 Пакоі',uk:'🛋 Кімнати'},
+  laundry:{be:'🧺 Пранне',uk:'🧺 Прання'},shop:{be:'🛒 Пакупкі і рахункі',uk:'🛒 Покупки й рахунки'},misc:{be:'🌿 Іншае',uk:'🌿 Інше'}
 };
+const SEED_TASKS={
+  dishes:{be:'Памыць посуд / пасудамыйка',uk:'Помити посуд / посудомийка'},
+  stove:{be:'Выцерці стол і пліту',uk:'Протерти стіл і плиту'},
+  trash:{be:'Вынесці смецце',uk:'Винести сміття'},
+  fridge:{be:'Разабраць халадзільнік',uk:'Розібрати холодильник'},
+  tub:{be:'Памыць ванну і ракавіну',uk:'Помити ванну й раковину'},
+  wc:{be:'Памыць унітаз',uk:'Помити унітаз'},
+  towels:{be:'Змяніць ручнікі',uk:'Змінити рушники'},
+  vacuum:{be:'Пыласос',uk:'Пилосос'},
+  floor:{be:'Памыць падлогу',uk:'Помити підлогу'},
+  dust:{be:'Выцерці пыл',uk:'Витерти пил'},
+  bedding:{be:'Змяніць пасцельную бялізну',uk:'Змінити постільну білизну'},
+  wash:{be:'Запусціць пральку',uk:'Запустити пральку'},
+  fold:{be:'Развесіць і скласці бялізну',uk:'Розвісити й скласти білизну'},
+  groceries:{be:'Закупка прадуктаў',uk:'Закупівля продуктів'},
+  bills:{be:'Аплаціць рахункі',uk:'Оплатити рахунки'},
+  plants:{be:'Паліць кветкі',uk:'Полити квіти'}
+};
+
+const FREQ={daily:{days:1,w:7},every3:{days:3,w:2.5},weekly:{days:7,w:1},biweekly:{days:14,w:.5},monthly:{days:30,w:.25},asneeded:{days:0,w:.5}};
 const STORE_KEY='domovik-v1', CFG_KEY='domovik-cfg', GIST_FILE='domovik.json';
 const uid=()=>Math.random().toString(36).slice(2,9);
 const DAY=864e5;
 
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let C=Object.assign({me:'a',token:'',gist:'',theme:'auto',lang:(navigator.language||'').startsWith('uk')?'uk':'be'},ls.get(CFG_KEY)||{});
+const T=(k,v={})=>(I18N[C.lang][k]??I18N.be[k]??k).replace(/\{(\w+)\}/g,(_,m)=>v[m]??'');
+const fl=k=>T('f_'+k);
+
+/* zone display: a seed zone name in either language shows in the current one */
+function zl(z){for(const v of Object.values(SEED_ZONES))if(v.be===z||v.uk===z)return v[C.lang];return z}
+const tt=t=>t.sk&&SEED_TASKS[t.sk]?SEED_TASKS[t.sk][C.lang]:t.title;
+
 function seed(){
-  const t=(title,zone,owner,freq,effort)=>({id:uid(),title,zone,owner,next:'a',freq,effort,lastDone:null,lastBy:null,note:''});
+  const Z=k=>SEED_ZONES[k][C.lang];
+  const t=(sk,zone,owner,freq,effort)=>({id:uid(),sk,title:SEED_TASKS[sk][C.lang],zone:Z(zone),owner,next:'a',freq,effort,lastDone:null,lastBy:null,note:''});
   return {
-    people:{a:{name:'Уладзь',color:'#e07a5f'},b:{name:'Яна',color:'#5b8e7d'}},
-    zones:['🍳 Кухня','🛁 Ванная','🛋 Пакоі','🧺 Пранне','🛒 Пакупкі і рахункі','🌿 Іншае'],
+    people:{a:{name:'Уладзь',color:'#e07a5f'},b:{name:T('defB'),color:'#5b8e7d'}},
+    zones:Object.keys(SEED_ZONES).map(Z),
     tasks:[
-      t('Памыць посуд / пасудамыйка','🍳 Кухня','rotate','daily',1),
-      t('Выцерці стол і пліту','🍳 Кухня','rotate','daily',1),
-      t('Вынесці смецце','🍳 Кухня','a','every3',1),
-      t('Разабраць халадзільнік','🍳 Кухня','b','monthly',2),
-      t('Памыць ванну і ракавіну','🛁 Ванная','a','weekly',2),
-      t('Памыць унітаз','🛁 Ванная','b','weekly',2),
-      t('Змяніць ручнікі','🛁 Ванная','b','weekly',1),
-      t('Пыласос','🛋 Пакоі','a','weekly',2),
-      t('Памыць падлогу','🛋 Пакоі','rotate','biweekly',3),
-      t('Выцерці пыл','🛋 Пакоі','b','biweekly',1),
-      t('Змяніць пасцельную бялізну','🛋 Пакоі','both','biweekly',2),
-      t('Запусціць пральку','🧺 Пранне','b','weekly',1),
-      t('Развесіць і скласці бялізну','🧺 Пранне','a','weekly',2),
-      t('Закупка прадуктаў','🛒 Пакупкі і рахункі','both','weekly',2),
-      t('Аплаціць рахункі','🛒 Пакупкі і рахункі','a','monthly',1),
-      t('Паліць кветкі','🌿 Іншае','b','every3',1)
+      t('dishes','kitchen','rotate','daily',1),t('stove','kitchen','rotate','daily',1),t('trash','kitchen','a','every3',1),t('fridge','kitchen','b','monthly',2),
+      t('tub','bath','a','weekly',2),t('wc','bath','b','weekly',2),t('towels','bath','b','weekly',1),
+      t('vacuum','rooms','a','weekly',2),t('floor','rooms','rotate','biweekly',3),t('dust','rooms','b','biweekly',1),t('bedding','rooms','both','biweekly',2),
+      t('wash','laundry','b','weekly',1),t('fold','laundry','a','weekly',2),
+      t('groceries','shop','both','weekly',2),t('bills','shop','a','monthly',1),
+      t('plants','misc','b','every3',1)
     ],
-    log:[],
-    updated:Date.now()
+    log:[],updated:Date.now()
   };
 }
 
-const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let S=ls.get(STORE_KEY)||seed();
-let C=Object.assign({me:'a',token:'',gist:'',theme:'auto'},ls.get(CFG_KEY)||{});
+let S=ls.get(STORE_KEY);
+if(!S)S=seed();
+else{ /* migrate v1 data: tag untouched seed tasks so they translate */
+  S.tasks.forEach(t=>{if(!t.sk)for(const[k,v]of Object.entries(SEED_TASKS))if(v.be===t.title||v.uk===t.title){t.sk=k;break}});
+}
 let UI={tab:'tasks',filter:'all',group:'zone'};
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),1800)}
 function applyTheme(){document.documentElement.dataset.theme=C.theme==='auto'?'':C.theme}
+function applyLang(){
+  document.documentElement.lang=C.lang;document.title=T('app');$('#appName').textContent=T('app');
+  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('on',b.dataset.lang===C.lang));
+  document.querySelectorAll('.tabs button').forEach(b=>b.textContent=T('tab_'+b.dataset.tab));
+  $('#addBtn').title=T('add');
+}
 
 function ownerInfo(o,task){
   const P=S.people;
   if(o==='a'||o==='b')return{label:P[o].name,color:P[o].color};
-  if(o==='both')return{label:'Разам',color:'var(--both)'};
+  if(o==='both')return{label:T('both'),color:'var(--both)'};
   return{label:'🔄 '+P[task?.next||'a'].name,color:'var(--rot)'};
 }
+function ago(ts){const d=Math.floor((Date.now()-ts)/DAY);return d<=0?T('today'):d===1?T('yesterday'):T('daysAgo',{n:d})}
 function dueInfo(t){
   const f=FREQ[t.freq];
-  if(!f.days)return{txt:t.lastDone?'апошні раз '+ago(t.lastDone):'па патрэбе',cls:'',score:9999};
-  if(!t.lastDone)return{txt:'яшчэ не рабілі',cls:'due-soon',score:-1};
+  if(!f.days)return{txt:t.lastDone?T('lastTime',{x:ago(t.lastDone)}):T('asNeeded'),cls:'',score:9999};
+  if(!t.lastDone)return{txt:T('never'),cls:'due-soon',score:-1};
   const left=Math.round((t.lastDone+f.days*DAY-Date.now())/DAY);
-  if(left<0)return{txt:'пратэрмінавана '+(-left)+' дн.',cls:'due-over',score:left};
-  if(left===0)return{txt:'сёння',cls:'due-soon',score:0};
-  if(left===1)return{txt:'заўтра',cls:'due-soon',score:1};
-  return{txt:'праз '+left+' дн.',cls:'due-ok',score:left};
+  if(left<0)return{txt:T('overdue',{n:-left}),cls:'due-over',score:left};
+  if(left===0)return{txt:T('today'),cls:'due-soon',score:0};
+  if(left===1)return{txt:T('tomorrow'),cls:'due-soon',score:1};
+  return{txt:T('inDays',{n:left}),cls:'due-ok',score:left};
 }
-function ago(ts){const d=Math.floor((Date.now()-ts)/DAY);return d<=0?'сёння':d===1?'учора':d+' дн. таму'}
 
 function save(){S.updated=Date.now();ls.set(STORE_KEY,S);scheduleSync();render()}
 
 /* ---------- render ---------- */
 function render(){
+  applyLang();
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===UI.tab));
   ['tasks','balance','settings'].forEach(k=>$('#tab-'+k).hidden=UI.tab!==k);
   $('#addBtn').hidden=UI.tab!=='tasks';
@@ -186,38 +253,36 @@ function render(){
 function taskHTML(t){
   const o=ownerInfo(t.owner,t), d=dueInfo(t);
   return `<div class="task">
-    <button class="done" data-done="${t.id}" title="Зроблена">✓</button>
+    <button class="done" data-done="${t.id}" title="${T('markDone')}">✓</button>
     <div class="main">
-      <div class="t">${esc(t.title)}</div>
-      <div class="meta"><span class="${d.cls}">${d.txt}</span><span>${FREQ[t.freq].l}</span><span class="dots">${'●'.repeat(t.effort)}${'○'.repeat(3-t.effort)}</span>${UI.group==='due'?`<span>${esc(t.zone)}</span>`:''}</div>
+      <div class="t">${esc(tt(t))}</div>
+      <div class="meta"><span class="${d.cls}">${d.txt}</span><span>${fl(t.freq)}</span><span class="dots">${'●'.repeat(t.effort)}${'○'.repeat(3-t.effort)}</span>${UI.group==='due'?`<span>${esc(zl(t.zone))}</span>`:''}</div>
     </div>
-    <button class="pill" style="background:${o.color}" data-cycle="${t.id}" title="Змяніць адказнага">${esc(o.label)}</button>
-    <button class="edit" data-edit="${t.id}" title="Рэдагаваць">⋯</button>
+    <button class="pill" style="background:${o.color}" data-cycle="${t.id}" title="${T('changeOwner')}">${esc(o.label)}</button>
+    <button class="edit" data-edit="${t.id}" title="${T('edit')}">⋯</button>
   </div>`;
 }
 
 function renderTasks(){
   const P=S.people;
-  const filters=[['all','Усе'],['a',P.a.name],['b',P.b.name],['both','Разам'],['rotate','Па чарзе'],['due','🔥 Трэба зрабіць']];
+  const filters=[['all',T('all')],['a',P.a.name],['b',P.b.name],['both',T('both')],['rotate',T('rotate')],['due',T('todo')]];
   let list=S.tasks.filter(t=>{
     if(UI.filter==='all')return true;
-    if(UI.filter==='due'){const s=dueInfo(t).score;return s<=1}
+    if(UI.filter==='due')return dueInfo(t).score<=1;
     if(UI.filter==='a'||UI.filter==='b')return t.owner===UI.filter||t.owner==='both'||(t.owner==='rotate'&&t.next===UI.filter);
     return t.owner===UI.filter;
   });
   let body='';
-  if(!list.length)body='<div class="empty">Тут пуста. Можна адпачыць 🙂</div>';
+  if(!list.length)body=`<div class="empty">${T('empty')}</div>`;
   else if(UI.group==='zone'){
     const zones=[...S.zones,...new Set(list.map(t=>t.zone).filter(z=>!S.zones.includes(z)))];
-    zones.forEach(z=>{const ts=list.filter(t=>t.zone===z);if(ts.length)body+=`<div class="zone">${esc(z)}</div>`+ts.map(taskHTML).join('')});
-  } else {
-    body=list.slice().sort((x,y)=>dueInfo(x).score-dueInfo(y).score).map(taskHTML).join('');
-  }
+    zones.forEach(z=>{const ts=list.filter(t=>t.zone===z);if(ts.length)body+=`<div class="zone">${esc(zl(z))}</div>`+ts.map(taskHTML).join('')});
+  } else body=list.slice().sort((x,y)=>dueInfo(x).score-dueInfo(y).score).map(taskHTML).join('');
   $('#tab-tasks').innerHTML=`
     <div class="row">${filters.map(([k,l])=>`<button class="chip ${UI.filter===k?'on':''}" data-filter="${k}">${esc(l)}</button>`).join('')}</div>
     <div class="row"><span class="spacer"></span>
-      <button class="chip ${UI.group==='zone'?'on':''}" data-group="zone">Па зонах</button>
-      <button class="chip ${UI.group==='due'?'on':''}" data-group="due">Па тэрміне</button>
+      <button class="chip ${UI.group==='zone'?'on':''}" data-group="zone">${T('byZone')}</button>
+      <button class="chip ${UI.group==='due'?'on':''}" data-group="due">${T('byDue')}</button>
     </div>${body}`;
 }
 
@@ -233,51 +298,53 @@ function bar(a,b){
 }
 function renderBalance(){
   const P=S.people,L=load();
-  const since=Date.now()-7*DAY, since30=Date.now()-30*DAY;
   const cnt=(from)=>{const c={a:0,b:0};S.log.filter(e=>e.ts>=from).forEach(e=>{const t=S.tasks.find(x=>x.id===e.taskId);c[e.by]+=t?t.effort:1});return c};
-  const w=cnt(since),m=cnt(since30);
+  const w=cnt(Date.now()-7*DAY),m=cnt(Date.now()-30*DAY);
   const own=k=>S.tasks.filter(t=>t.owner===k).length;
+  const none=`<div class="hint">${T('nothingYet')}</div>`;
   $('#tab-balance').innerHTML=`
-    <div class="card"><h3>Плануемая нагрузка</h3>${bar(L.a,L.b)}
-      <div class="hint">Лічыцца як частата × цяжкасць. "Разам" і "па чарзе" дзеляцца напалову. Сваіх спраў: ${esc(P.a.name)} ${own('a')}, ${esc(P.b.name)} ${own('b')}, агульных ${own('both')+own('rotate')}.</div></div>
-    <div class="card"><h3>Рэальна зроблена за 7 дзён</h3>${w.a+w.b?bar(w.a,w.b):'<div class="hint">Пакуль нічога не адзначана.</div>'}</div>
-    <div class="card"><h3>За 30 дзён</h3>${m.a+m.b?bar(m.a,m.b):'<div class="hint">Пакуль нічога не адзначана.</div>'}</div>
-    <div class="card"><h3>Гісторыя</h3><div class="log">${S.log.slice().reverse().slice(0,60).map(e=>{
+    <div class="card"><h3>${T('planned')}</h3>${bar(L.a,L.b)}
+      <div class="hint">${esc(T('plannedHint',{a:P.a.name,na:own('a'),b:P.b.name,nb:own('b'),n:own('both')+own('rotate')}))}</div></div>
+    <div class="card"><h3>${T('done7')}</h3>${w.a+w.b?bar(w.a,w.b):none}</div>
+    <div class="card"><h3>${T('done30')}</h3>${m.a+m.b?bar(m.a,m.b):none}</div>
+    <div class="card"><h3>${T('history')}</h3><div class="log">${S.log.slice().reverse().slice(0,60).map(e=>{
       const t=S.tasks.find(x=>x.id===e.taskId);
-      return `<div><span style="color:${P[e.by].color};font-weight:600">${esc(P[e.by].name)}</span><span>${esc(t?t.title:'(выдалена)')}</span><span>${new Date(e.ts).toLocaleDateString('be',{day:'numeric',month:'short'})}</span></div>`}).join('')||'<div class="hint">Пуста</div>'}</div></div>`;
+      return `<div><span style="color:${P[e.by].color};font-weight:600">${esc(P[e.by].name)}</span><span>${esc(t?tt(t):T('deleted'))}</span><span>${new Date(e.ts).toLocaleDateString(C.lang,{day:'numeric',month:'short'})}</span></div>`}).join('')||`<div class="hint">${T('emptyShort')}</div>`}</div></div>`;
 }
 
 function renderSettings(){
   const P=S.people;
   $('#tab-settings').innerHTML=`
-    <div class="card"><h3>Мы</h3>
+    <div class="card"><h3>${T('us')}</h3>
       <div class="people">${['a','b'].map(k=>`<div><div class="color"><input type="color" value="${P[k].color}" data-pcolor="${k}"><input type="text" value="${esc(P[k].name)}" data-pname="${k}"></div></div>`).join('')}</div>
-      <label class="f">Хто карыстаецца гэтай прыладай (каму залічваць ✓)</label>
+      <label class="f">${T('whoMe')}</label>
       <div class="seg">${['a','b'].map(k=>`<button type="button" class="${C.me===k?'on':''}" data-me="${k}">${esc(P[k].name)}</button>`).join('')}</div>
+      <label class="f">${T('language')}</label>
+      <div class="seg"><button type="button" class="${C.lang==='be'?'on':''}" data-lang="be">Беларуская</button><button type="button" class="${C.lang==='uk'?'on':''}" data-lang="uk">Українська</button></div>
     </div>
-    <div class="card"><h3>Зоны</h3>
-      <textarea id="zones" rows="6">${esc(S.zones.join('\n'))}</textarea>
-      <div class="hint">Адна зона на радок, эмодзі на пачатку па жаданні.</div>
-      <div class="btns"><button class="btn" id="saveZones">Захаваць зоны</button></div>
+    <div class="card"><h3>${T('zones')}</h3>
+      <textarea id="zones" rows="6">${esc(S.zones.map(zl).join('\n'))}</textarea>
+      <div class="hint">${T('zonesHint')}</div>
+      <div class="btns"><button class="btn" id="saveZones">${T('saveZones')}</button></div>
     </div>
-    <div class="card"><h3>Сінхранізацыя праз GitHub Gist</h3>
-      <label class="f">GitHub token (толькі права gist)</label>
+    <div class="card"><h3>${T('syncTitle')}</h3>
+      <label class="f">${T('tokenLbl')}</label>
       <input type="password" id="token" value="${esc(C.token)}" placeholder="ghp_...">
       <label class="f">Gist ID</label>
-      <input type="text" id="gist" value="${esc(C.gist)}" placeholder="пуста = стварыць новы">
+      <input type="text" id="gist" value="${esc(C.gist)}" placeholder="${T('gistPh')}">
       <div class="btns">
-        <button class="btn pri" id="gistSave">${C.gist?'Захаваць у gist':'Стварыць gist'}</button>
-        <button class="btn" id="gistLoad" ${C.gist?'':'disabled'}>Загрузіць з gist</button>
+        <button class="btn pri" id="gistSave">${C.gist?T('gistSave'):T('gistCreate')}</button>
+        <button class="btn" id="gistLoad" ${C.gist?'':'disabled'}>${T('gistLoad')}</button>
       </div>
-      <div class="hint">Пасля налады змены захоўваюцца аўтаматычна, а пры адкрыцці старонка падцягвае свежую версію. Другі чалавек уводзіць той жа token і Gist ID.</div>
+      <div class="hint">${T('syncHint')}</div>
     </div>
-    <div class="card"><h3>Іншае</h3>
-      <label class="f">Тэма</label>
-      <div class="seg">${[['auto','Аўта'],['light','Светлая'],['dark','Цёмная']].map(([k,l])=>`<button type="button" class="${C.theme===k?'on':''}" data-theme-set="${k}">${l}</button>`).join('')}</div>
+    <div class="card"><h3>${T('other')}</h3>
+      <label class="f">${T('theme')}</label>
+      <div class="seg">${['auto','light','dark'].map(k=>`<button type="button" class="${C.theme===k?'on':''}" data-theme-set="${k}">${T(k)}</button>`).join('')}</div>
       <div class="btns">
-        <button class="btn" id="exp">Экспарт JSON</button>
-        <button class="btn" id="imp">Імпарт JSON</button>
-        <button class="btn del" id="reset">Скінуць усё</button>
+        <button class="btn" id="exp">${T('exp')}</button>
+        <button class="btn" id="imp">${T('imp')}</button>
+        <button class="btn del" id="reset">${T('reset')}</button>
       </div>
     </div>`;
 }
@@ -289,22 +356,23 @@ function openTask(id){
   const st={owner:t.owner,freq:t.freq,effort:t.effort};
   const f=$('#form');
   const seg=(name,opts,val)=>`<div class="seg" data-seg="${name}">${opts.map(([k,l])=>`<button type="button" data-v="${k}" class="${String(val)===String(k)?'on':''}">${esc(l)}</button>`).join('')}</div>`;
-  f.innerHTML=`<h2>${id?'Рэдагаваць':'Новая справа'}</h2>
-    <label class="f">Што трэба рабіць</label><input type="text" name="title" value="${esc(t.title)}" required placeholder="Напр. памыць вокны">
-    <label class="f">Зона</label><select name="zone">${S.zones.map(z=>`<option ${z===t.zone?'selected':''}>${esc(z)}</option>`).join('')}</select>
-    <label class="f">Хто адказвае</label>${seg('owner',[['a',P.a.name],['b',P.b.name],['both','Разам'],['rotate','Па чарзе']],st.owner)}
-    <label class="f">Як часта</label>${seg('freq',Object.entries(FREQ).map(([k,v])=>[k,v.l]),st.freq)}
-    <label class="f">Наколькі цяжка</label>${seg('effort',[[1,'● Лёгка'],[2,'●● Сярэдне'],[3,'●●● Цяжка']],st.effort)}
-    <label class="f">Нататка</label><textarea name="note" placeholder="Па жаданні">${esc(t.note)}</textarea>
-    <div class="btns">${id?'<button type="button" class="btn del" id="delTask">Выдаліць</button>':''}<span class="spacer"></span>
-      <button type="button" class="btn" id="cancel">Адмена</button><button class="btn pri" value="ok">Захаваць</button></div>`;
+  f.innerHTML=`<h2>${id?T('edit'):T('newTask')}</h2>
+    <label class="f">${T('what')}</label><input type="text" name="title" value="${esc(id?tt(t):'')}" required placeholder="${T('whatPh')}">
+    <label class="f">${T('zone')}</label><select name="zone">${S.zones.map(z=>`<option value="${esc(z)}" ${z===t.zone?'selected':''}>${esc(zl(z))}</option>`).join('')}</select>
+    <label class="f">${T('who')}</label>${seg('owner',[['a',P.a.name],['b',P.b.name],['both',T('both')],['rotate',T('rotate')]],st.owner)}
+    <label class="f">${T('often')}</label>${seg('freq',Object.keys(FREQ).map(k=>[k,fl(k)]),st.freq)}
+    <label class="f">${T('hard')}</label>${seg('effort',[[1,T('e1')],[2,T('e2')],[3,T('e3')]],st.effort)}
+    <label class="f">${T('note')}</label><textarea name="note" placeholder="${T('notePh')}">${esc(t.note)}</textarea>
+    <div class="btns">${id?`<button type="button" class="btn del" id="delTask">${T('del')}</button>`:''}<span class="spacer"></span>
+      <button type="button" class="btn" id="cancel">${T('cancel')}</button><button class="btn pri" value="ok">${T('save')}</button></div>`;
   f.querySelectorAll('[data-seg]').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');st[g.dataset.seg]=g.dataset.seg==='effort'?+b.dataset.v:b.dataset.v});
   $('#cancel').onclick=()=>$('#dlg').close();
-  if(id)$('#delTask').onclick=()=>{if(confirm('Выдаліць справу?')){S.tasks=S.tasks.filter(x=>x.id!==id);$('#dlg').close();save()}};
+  if(id)$('#delTask').onclick=()=>{if(confirm(T('delQ'))){S.tasks=S.tasks.filter(x=>x.id!==id);$('#dlg').close();save()}};
   f.onsubmit=e=>{
     const fd=new FormData(f);const title=fd.get('title').trim();if(!title){e.preventDefault();return}
     const data={title,zone:fd.get('zone'),note:fd.get('note').trim(),...st};
-    if(id)Object.assign(t,data);else S.tasks.push({id:uid(),next:C.me,lastDone:null,lastBy:null,...data});
+    if(id){if(t.sk&&title!==tt(t))delete t.sk;Object.assign(t,data)}
+    else S.tasks.push({id:uid(),next:C.me,lastDone:null,lastBy:null,...data});
     save();
   };
   $('#dlg').showModal();
@@ -319,18 +387,24 @@ function markDone(id,btn){
   S.log.push({taskId:id,by,ts:t.lastDone});
   if(S.log.length>500)S.log=S.log.slice(-500);
   btn.classList.add('flash');
-  toast('Малайчына, '+S.people[by].name+'!');
+  toast(T('wellDone',{x:S.people[by].name}));
   setTimeout(save,350);
 }
 function cycleOwner(id){
   const order=['a','b','both','rotate'];const t=S.tasks.find(x=>x.id===id);
   t.owner=order[(order.indexOf(t.owner)+1)%order.length];save();
 }
+function saveZones(){
+  const nz=$('#zones').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  S.tasks.forEach(t=>{const m=nz.find(z=>z===t.zone||z===zl(t.zone));if(m)t.zone=m});
+  S.zones=nz;save();toast(T('zonesSaved'));
+}
 
 document.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   const d=b.dataset;
   if(d.tab){UI.tab=d.tab;render()}
+  else if(d.lang){C.lang=d.lang;ls.set(CFG_KEY,C);render()}
   else if(d.filter){UI.filter=d.filter;render()}
   else if(d.group){UI.group=d.group;render()}
   else if(d.done)markDone(d.done,b);
@@ -339,12 +413,12 @@ document.addEventListener('click',e=>{
   else if(d.me){C.me=d.me;ls.set(CFG_KEY,C);render()}
   else if(d.themeSet){C.theme=d.themeSet;ls.set(CFG_KEY,C);applyTheme();render()}
   else if(b.id==='addBtn')openTask(null);
-  else if(b.id==='saveZones'){S.zones=$('#zones').value.split('\n').map(s=>s.trim()).filter(Boolean);save();toast('Зоны захаваныя')}
+  else if(b.id==='saveZones')saveZones();
   else if(b.id==='gistSave'){readGistCfg();pushGist(true)}
   else if(b.id==='gistLoad'){readGistCfg();pullGist(true)}
   else if(b.id==='exp'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));a.download='domovik.json';a.click()}
-  else if(b.id==='imp'){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=async()=>{try{const d=JSON.parse(await i.files[0].text());if(d.tasks){S=d;save();toast('Імпартавана')}}catch(err){toast('Не атрымалася прачытаць файл')}};i.click()}
-  else if(b.id==='reset'){if(confirm('Скінуць усе справы і гісторыю да пачатковых?')){S=seed();save()}}
+  else if(b.id==='imp'){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=async()=>{try{const d=JSON.parse(await i.files[0].text());if(d.tasks){S=d;save();toast(T('imported'))}}catch(err){toast(T('badFile'))}};i.click()}
+  else if(b.id==='reset'){if(confirm(T('resetQ'))){S=seed();save()}}
 });
 document.addEventListener('change',e=>{
   const d=e.target.dataset;
@@ -359,28 +433,28 @@ const gh=(path,opt={})=>fetch('https://api.github.com'+path,{...opt,headers:{'Au
 let syncT=null;
 function scheduleSync(){if(!C.token||!C.gist)return;clearTimeout(syncT);setSync('…');syncT=setTimeout(()=>pushGist(false),1500)}
 async function pushGist(manual){
-  if(!C.token){toast('Увядзі token');return}
+  if(!C.token){toast(T('needToken'));return}
   try{
-    const body=JSON.stringify({description:'Дамавік: хатнія справы',public:false,files:{[GIST_FILE]:{content:JSON.stringify(S)}}});
+    const body=JSON.stringify({description:'Дамавік / Домовик',public:false,files:{[GIST_FILE]:{content:JSON.stringify(S)}}});
     const r=C.gist?await gh('/gists/'+C.gist,{method:'PATCH',body}):await gh('/gists',{method:'POST',body});
     if(!r.ok)throw new Error(r.status);
     const j=await r.json();
     if(!C.gist){C.gist=j.id;ls.set(CFG_KEY,C);if(UI.tab==='settings')render()}
-    setSync('✓ сінхранізавана');if(manual)toast('Захавана ў gist');
-  }catch(err){setSync('⚠ няма сінхры');if(manual)toast('Памылка gist: '+err.message)}
+    setSync(T('synced'));if(manual)toast(T('savedGist'));
+  }catch(err){setSync(T('noSync'));if(manual)toast(T('gistErr')+err.message)}
 }
 async function pullGist(manual){
   if(!C.token||!C.gist)return;
   try{
     setSync('…');
     const r=await gh('/gists/'+C.gist+'?t='+Date.now());if(!r.ok)throw new Error(r.status);
-    const j=await r.json();const f=j.files[GIST_FILE];if(!f)throw new Error('няма файла');
+    const j=await r.json();const f=j.files[GIST_FILE];if(!f)throw new Error(T('noFile'));
     const txt=f.truncated?await (await fetch(f.raw_url)).text():f.content;
     const d=JSON.parse(txt);
     if(manual||!S.updated||d.updated>=S.updated){S=d;ls.set(STORE_KEY,S);render()}
     else pushGist(false);
-    setSync('✓ сінхранізавана');if(manual)toast('Загружана');
-  }catch(err){setSync('⚠ няма сінхры');if(manual)toast('Памылка gist: '+err.message)}
+    setSync(T('synced'));if(manual)toast(T('loaded'));
+  }catch(err){setSync(T('noSync'));if(manual)toast(T('gistErr')+err.message)}
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullGist(false)});
 
