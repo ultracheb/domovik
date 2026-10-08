@@ -114,13 +114,13 @@ dialog h2{margin:0;font-size:18px}
     <div class="lang"><button data-lang="be">BE</button><button data-lang="uk">UK</button></div>
   </header>
   <div class="tabs">
-    <button data-tab="tasks" class="on"></button>
-    <button data-tab="scales"></button>
+    <button data-tab="scales" class="on"></button>
+    <button data-tab="tasks"></button>
     <button data-tab="balance"></button>
     <button data-tab="settings"></button>
   </div>
-  <section id="tab-tasks"></section>
-  <section id="tab-scales" hidden></section>
+  <section id="tab-scales"></section>
+  <section id="tab-tasks" hidden></section>
   <section id="tab-balance" hidden></section>
   <section id="tab-settings" hidden></section>
 </div>
@@ -237,7 +237,7 @@ if(!S)S=seed();
 else{ /* migrate v1 data: tag untouched seed tasks so they translate */
   S.tasks.forEach(t=>{if(!t.sk)for(const[k,v]of Object.entries(SEED_TASKS))if(v.be===t.title||v.uk===t.title){t.sk=k;break}});
 }
-let UI={tab:'tasks',filter:'all',group:'zone'};
+let UI={tab:'scales',filter:'all',group:'zone'};
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
