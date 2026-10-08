@@ -81,6 +81,29 @@ dialog h2{margin:0;font-size:18px}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.on{opacity:1}
 .lang{display:flex;gap:2px;background:var(--chip);border-radius:8px;padding:2px}.lang button{border:0;background:none;padding:3px 7px;border-radius:6px;font-size:12px;color:var(--muted)}.lang button.on{background:var(--card);color:var(--ink);font-weight:700}
+
+.tabs button{padding:8px 4px;font-size:14px}
+.verdict{text-align:center;font-weight:700;font-size:15px}
+#scaleSvg{width:100%;max-width:520px;display:block;margin:4px auto 0;overflow:visible}
+#scaleSvg .frame line{stroke:var(--muted);stroke-width:3;stroke-linecap:round}
+#scaleSvg .frame line.beam{stroke:var(--ink);stroke-width:5}
+#scaleSvg .pivot{fill:var(--ink)}
+#scaleSvg .bowl{fill:var(--chip);stroke:var(--muted);stroke-width:2}
+.scales{padding-bottom:52px}
+.pans{display:grid;align-items:start;margin-top:-6px!important;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;margin:0 auto}
+.pan{background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:8px;min-height:90px;transition:transform .05s linear,border-color .15s,background .15s}
+.panHead{display:flex;justify-content:space-between;font-weight:700;margin-bottom:2px}
+.panSub{font-size:11px;color:var(--muted);margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.tchip{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:9px;padding:5px 8px;font-size:13px;cursor:grab;user-select:none;touch-action:none;display:flex;gap:6px;align-items:center;max-width:100%}
+.tchip b{font-size:11px;color:var(--muted);font-weight:700}
+.tchip.dragging{opacity:.3}
+.tchip.ghost{position:fixed;z-index:50;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.25);transform:rotate(-3deg);cursor:grabbing}
+.pool{border-style:dashed;border-width:2px}
+[data-drop].over{border-color:var(--ink)!important;background:var(--chip)}
+.dropHint{font-size:12px;color:var(--muted);padding:6px 2px}
+.quick{display:flex;gap:6px;margin-bottom:10px}
+.quick input{flex:1}
 </style>
 </head>
 <body>
@@ -92,10 +115,12 @@ dialog h2{margin:0;font-size:18px}
   </header>
   <div class="tabs">
     <button data-tab="tasks" class="on"></button>
+    <button data-tab="scales"></button>
     <button data-tab="balance"></button>
     <button data-tab="settings"></button>
   </div>
   <section id="tab-tasks"></section>
+  <section id="tab-scales" hidden></section>
   <section id="tab-balance" hidden></section>
   <section id="tab-settings" hidden></section>
 </div>
@@ -124,7 +149,10 @@ be:{
   note:'Нататка',notePh:'Па жаданні',del:'Выдаліць',cancel:'Адмена',save:'Захаваць',delQ:'Выдаліць справу?',
   wellDone:'Малайчына, {x}!',zonesSaved:'Зоны захаваныя',imported:'Імпартавана',badFile:'Не атрымалася прачытаць файл',resetQ:'Скінуць усе справы і гісторыю да пачатковых?',
   needToken:'Увядзі token',savedGist:'Захавана ў gist',gistErr:'Памылка gist: ',noFile:'няма файла',loaded:'Загружана',synced:'✓ сінхранізавана',noSync:'⚠ няма сінхры',
-  defB:'Яна'
+  defB:'Яна',
+  tab_scales:'Вагі',nobody:'Нічыя',sharedPool:'🤝 Агульныя (дзеляцца напалову)',basket:'🧺 Карзінка: яшчэ не размеркавана',quickPh:'Закінуць новую справу…',addShort:'Дадаць',
+  scalesHint:'Перацягвай справы паміж шалямі, у агульныя ці назад у карзінку. Вага = колькі разоў на тыдзень × цяжкасць. Націсні на справу, каб яе змяніць.',
+  balanced:'⚖️ Ураўнаважана',heavier:'Перавес: {x} +{d}',inclShared:'з іх агульных {s}',dropHere:'Кідай сюды'
 },
 uk:{
   app:'Домовик',
@@ -143,7 +171,10 @@ uk:{
   note:'Нотатка',notePh:'За бажанням',del:'Видалити',cancel:'Скасувати',save:'Зберегти',delQ:'Видалити справу?',
   wellDone:'Молодець, {x}!',zonesSaved:'Зони збережено',imported:'Імпортовано',badFile:'Не вдалося прочитати файл',resetQ:'Скинути всі справи та історію до початкових?',
   needToken:'Введи token',savedGist:'Збережено в gist',gistErr:'Помилка gist: ',noFile:'немає файлу',loaded:'Завантажено',synced:'✓ синхронізовано',noSync:'⚠ немає синхронізації',
-  defB:'Вона'
+  defB:'Вона',
+  tab_scales:'Терези',nobody:'Нічия',sharedPool:'🤝 Спільні (діляться навпіл)',basket:'🧺 Кошик: ще не розподілено',quickPh:'Закинути нову справу…',addShort:'Додати',
+  scalesHint:'Перетягуй справи між шальками, у спільні або назад у кошик. Вага = скільки разів на тиждень × складність. Натисни на справу, щоб її змінити.',
+  balanced:'⚖️ Рівновага',heavier:'Перевага: {x} +{d}',inclShared:'з них спільних {s}',dropHere:'Кидай сюди'
 }};
 /* seed zones & tasks in both languages; untouched seed items follow the current language */
 const SEED_ZONES={
@@ -223,6 +254,7 @@ function ownerInfo(o,task){
   const P=S.people;
   if(o==='a'||o==='b')return{label:P[o].name,color:P[o].color};
   if(o==='both')return{label:T('both'),color:'var(--both)'};
+  if(o==='none')return{label:T('nobody'),color:'var(--muted)'};
   return{label:'🔄 '+P[task?.next||'a'].name,color:'var(--rot)'};
 }
 function ago(ts){const d=Math.floor((Date.now()-ts)/DAY);return d<=0?T('today'):d===1?T('yesterday'):T('daysAgo',{n:d})}
@@ -243,9 +275,10 @@ function save(){S.updated=Date.now();ls.set(STORE_KEY,S);scheduleSync();render()
 function render(){
   applyLang();
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===UI.tab));
-  ['tasks','balance','settings'].forEach(k=>$('#tab-'+k).hidden=UI.tab!==k);
+  ['tasks','scales','balance','settings'].forEach(k=>$('#tab-'+k).hidden=UI.tab!==k);
   $('#addBtn').hidden=UI.tab!=='tasks';
   if(UI.tab==='tasks')renderTasks();
+  if(UI.tab==='scales')renderScales();
   if(UI.tab==='balance')renderBalance();
   if(UI.tab==='settings')renderSettings();
 }
@@ -288,7 +321,7 @@ function renderTasks(){
 
 function load(){
   const L={a:0,b:0};
-  S.tasks.forEach(t=>{const w=FREQ[t.freq].w*t.effort;if(t.owner==='a'||t.owner==='b')L[t.owner]+=w;else{L.a+=w/2;L.b+=w/2}});
+  S.tasks.forEach(t=>{const w=tw(t);if(t.owner==='a'||t.owner==='b')L[t.owner]+=w;else if(t.owner!=='none'){L.a+=w/2;L.b+=w/2}});
   return L;
 }
 function bar(a,b){
@@ -349,6 +382,100 @@ function renderSettings(){
     </div>`;
 }
 
+/* ---------- scales ---------- */
+function tw(t){return FREQ[t.freq].w*t.effort}
+const fmt=n=>(Math.round(n*10)/10).toString().replace('.',',');
+let scaleAngle=0, scaleAnim=null;
+function drawBeam(a){
+  const svg=$('#scaleSvg');if(!svg)return;
+  const r=a*Math.PI/180, L=118, cx=150, cy=44, dx=L*Math.cos(r), dy=L*Math.sin(r);
+  const lx=cx-dx, ly=cy-dy, rx=cx+dx, ry=cy+dy, s=34;
+  const bowl=(x,y)=>`<line x1="${x}" y1="${y}" x2="${x-26}" y2="${y+s}"/><line x1="${x}" y1="${y}" x2="${x+26}" y2="${y+s}"/><path d="M${x-34} ${y+s} Q${x} ${y+s+18} ${x+34} ${y+s}Z" class="bowl"/>`;
+  svg.innerHTML=`<g class="frame"><line x1="${cx}" y1="${cy}" x2="${cx}" y2="132"/><line x1="${cx-34}" y1="132" x2="${cx+34}" y2="132"/>
+    <line x1="${lx}" y1="${ly}" x2="${rx}" y2="${ry}" class="beam"/><circle cx="${cx}" cy="${cy}" r="5" class="pivot"/>
+    ${bowl(lx,ly)}${bowl(rx,ry)}</g>`;
+  const k=svg.getBoundingClientRect().width/300||1;
+  const pa=$('#panA'),pb=$('#panB');
+  if(pa)pa.style.transform=`translateY(${(-dy)*k}px)`;
+  if(pb)pb.style.transform=`translateY(${dy*k}px)`;
+}
+function animateBeam(to){
+  cancelAnimationFrame(scaleAnim);
+  const from=scaleAngle,t0=performance.now(),D=600;
+  const step=now=>{const p=Math.min(1,(now-t0)/D),e=1-Math.pow(1-p,3);scaleAngle=from+(to-from)*e;drawBeam(scaleAngle);if(p<1)scaleAnim=requestAnimationFrame(step)};
+  scaleAnim=requestAnimationFrame(step);
+}
+function chipHTML(t){
+  const col=t.owner==='a'||t.owner==='b'?S.people[t.owner].color:t.owner==='none'?'var(--line)':'var(--both)';
+  return `<div class="tchip" data-tid="${t.id}" style="border-left-color:${col}">${t.owner==='rotate'?'🔄 ':''}${esc(tt(t))}<b>${fmt(tw(t))}</b></div>`;
+}
+function renderScales(){
+  const P=S.people,L=load();
+  const own=k=>S.tasks.filter(t=>t.owner===k);
+  const shared=S.tasks.filter(t=>t.owner==='both'||t.owner==='rotate');
+  const sh=shared.reduce((s,t)=>s+tw(t),0)/2;
+  const tot=L.a+L.b, diff=L.a-L.b;
+  const target=tot?Math.max(-16,Math.min(16,(L.b-L.a)/tot*40)):0;
+  let verdict=T('balanced');
+  if(tot&&Math.abs(diff)/tot>0.05)verdict=T('heavier',{x:diff>0?P.a.name:P.b.name,d:fmt(Math.abs(diff))})+` · ${Math.round(L.a/tot*100)}% / ${Math.round(L.b/tot*100)}%`;
+  const pan=(k,id)=>`<div class="pan" id="${id}" data-drop="${k}">
+      <div class="panHead"><span style="color:${P[k].color}">${esc(P[k].name)}</span><b>${fmt(L[k])}</b></div>
+      ${sh?`<div class="panSub">${T('inclShared',{s:fmt(sh)})}</div>`:''}
+      <div class="chips">${own(k).map(chipHTML).join('')||`<div class="dropHint">${T('dropHere')}</div>`}</div></div>`;
+  $('#tab-scales').innerHTML=`
+    <div class="card scales">
+      <div class="verdict">${esc(verdict)}</div>
+      <svg id="scaleSvg" viewBox="0 0 300 136" aria-hidden="true"></svg>
+      <div class="pans">${pan('a','panA')}${pan('b','panB')}</div>
+    </div>
+    <div class="card pool" data-drop="both"><h3>${T('sharedPool')}</h3>
+      <div class="chips">${shared.map(chipHTML).join('')||`<div class="dropHint">${T('dropHere')}</div>`}</div></div>
+    <div class="card pool basket" data-drop="none"><h3>${T('basket')}</h3>
+      <form id="quickAdd" class="quick"><input type="text" name="q" placeholder="${T('quickPh')}" autocomplete="off"><button class="btn pri">${T('addShort')}</button></form>
+      <div class="chips">${own('none').map(chipHTML).join('')||`<div class="dropHint">${T('dropHere')}</div>`}</div></div>
+    <div class="hint">${T('scalesHint')}</div>`;
+  drawBeam(scaleAngle);
+  animateBeam(target);
+  $('#quickAdd').onsubmit=e=>{e.preventDefault();const v=e.target.q.value.trim();if(!v)return;
+    S.tasks.push({id:uid(),title:v,zone:S.zones[S.zones.length-1]||'',owner:'none',next:C.me,freq:'weekly',effort:1,lastDone:null,lastBy:null,note:''});save();
+    setTimeout(()=>$('#quickAdd input')?.focus(),0)};
+}
+window.addEventListener('resize',()=>{if(UI.tab==='scales')drawBeam(scaleAngle)});
+
+/* pointer drag for chips (works with mouse and touch) */
+let drag=null;
+document.addEventListener('pointerdown',e=>{
+  const c=e.target.closest('.tchip');if(!c||e.button>0)return;
+  e.preventDefault();
+  drag={id:c.dataset.tid,el:c,x:e.clientX,y:e.clientY,moved:false,ghost:null,over:null};
+  c.setPointerCapture(e.pointerId);
+});
+document.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<6)return;
+  if(!drag.moved){
+    drag.moved=true;const r=drag.el.getBoundingClientRect();
+    drag.ghost=drag.el.cloneNode(true);drag.ghost.classList.add('ghost');drag.ghost.style.width=r.width+'px';
+    drag.ox=drag.x-r.left;drag.oy=drag.y-r.top;document.body.appendChild(drag.ghost);drag.el.classList.add('dragging');
+  }
+  const edge=60;if(e.clientY<edge)window.scrollBy(0,-12);else if(e.clientY>innerHeight-edge)window.scrollBy(0,12);
+  drag.ghost.style.left=(e.clientX-drag.ox)+'px';drag.ghost.style.top=(e.clientY-drag.oy)+'px';
+  const under=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-drop]');
+  if(under!==drag.over){drag.over?.classList.remove('over');under?.classList.add('over');drag.over=under}
+});
+function endDrag(e,cancel){
+  if(!drag)return;const d=drag;drag=null;
+  d.ghost?.remove();d.el.classList.remove('dragging');d.over?.classList.remove('over');
+  if(cancel)return;
+  if(!d.moved){openTask(d.id);return}
+  if(!d.over)return;
+  const t=S.tasks.find(x=>x.id===d.id);const k=d.over.dataset.drop;
+  const nk=k==='both'?(t.owner==='rotate'||t.owner==='both'?t.owner:'both'):k;
+  if(nk!==t.owner){t.owner=nk;save()}
+}
+document.addEventListener('pointerup',e=>endDrag(e,false));
+document.addEventListener('pointercancel',e=>endDrag(e,true));
+
 /* ---------- task dialog ---------- */
 function openTask(id){
   const P=S.people;
@@ -359,7 +486,7 @@ function openTask(id){
   f.innerHTML=`<h2>${id?T('edit'):T('newTask')}</h2>
     <label class="f">${T('what')}</label><input type="text" name="title" value="${esc(id?tt(t):'')}" required placeholder="${T('whatPh')}">
     <label class="f">${T('zone')}</label><select name="zone">${S.zones.map(z=>`<option value="${esc(z)}" ${z===t.zone?'selected':''}>${esc(zl(z))}</option>`).join('')}</select>
-    <label class="f">${T('who')}</label>${seg('owner',[['a',P.a.name],['b',P.b.name],['both',T('both')],['rotate',T('rotate')]],st.owner)}
+    <label class="f">${T('who')}</label>${seg('owner',[['a',P.a.name],['b',P.b.name],['both',T('both')],['rotate',T('rotate')],['none',T('nobody')]],st.owner)}
     <label class="f">${T('often')}</label>${seg('freq',Object.keys(FREQ).map(k=>[k,fl(k)]),st.freq)}
     <label class="f">${T('hard')}</label>${seg('effort',[[1,T('e1')],[2,T('e2')],[3,T('e3')]],st.effort)}
     <label class="f">${T('note')}</label><textarea name="note" placeholder="${T('notePh')}">${esc(t.note)}</textarea>
