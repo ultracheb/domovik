@@ -104,6 +104,22 @@ dialog h2{margin:0;font-size:18px}
 .dropHint{font-size:12px;color:var(--muted);padding:6px 2px}
 .quick{display:flex;gap:6px;margin-bottom:10px}
 .quick input{flex:1}
+
+.tabs{overflow-x:auto;scrollbar-width:none}
+.tabs button{flex:1 0 auto;padding:8px 6px;font-size:13.5px}
+.tabs button[data-tab=settings]{flex:0 0 40px}
+.mood{font-weight:600;margin-bottom:8px}
+.sacks{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
+.sackWrap{display:flex;flex-direction:column;align-items:center}
+.tie{width:56px;height:24px;margin-bottom:-6px;position:relative;z-index:1}
+.tie path{fill:none;stroke:#a4875f;stroke-width:3;stroke-linecap:round}
+.sack{position:relative;width:100%;min-height:230px;padding:18px 10px 16px;background:color-mix(in srgb,#c9a979 22%,var(--card));border:2px solid color-mix(in srgb,#a4875f 55%,var(--line));border-radius:42% 42% 26px 26px / 14% 14% 26px 26px;overflow:hidden;transition:border-color .15s,transform .15s}
+.sackFill{position:absolute;left:0;right:0;bottom:0;height:var(--fill);background:color-mix(in srgb,var(--c) 22%,transparent);transition:height .5s ease}
+.sack>*:not(.sackFill){position:relative}
+.sackHead{display:flex;flex-direction:column;align-items:center;margin-bottom:10px;font-size:13px}
+.sackHead span{color:var(--muted);font-size:12px}
+.sack .chips{justify-content:center}
+.sack.over{transform:scale(1.02)}
 </style>
 </head>
 <body>
@@ -115,11 +131,13 @@ dialog h2{margin:0;font-size:18px}
   </header>
   <div class="tabs">
     <button data-tab="scales" class="on"></button>
+    <button data-tab="bags"></button>
     <button data-tab="tasks"></button>
     <button data-tab="balance"></button>
     <button data-tab="settings"></button>
   </div>
   <section id="tab-scales"></section>
+  <section id="tab-bags" hidden></section>
   <section id="tab-tasks" hidden></section>
   <section id="tab-balance" hidden></section>
   <section id="tab-settings" hidden></section>
@@ -150,6 +168,8 @@ be:{
   wellDone:'Малайчына, {x}!',zonesSaved:'Зоны захаваныя',imported:'Імпартавана',badFile:'Не атрымалася прачытаць файл',resetQ:'Скінуць усе справы і гісторыю да пачатковых?',
   needToken:'Увядзі token',savedGist:'Захавана ў gist',gistErr:'Памылка gist: ',noFile:'няма файла',loaded:'Загружана',synced:'✓ сінхранізавана',noSync:'⚠ няма сінхры',
   defB:'Яна',
+  tab_bags:'Мяшкі',bagsCount:'спраў: {n}',bagsEven:'🙂 Прыкладна пароўну',bagsMore:'{x}: мяшок крыху цяжэйшы',bagsMuch:'{x}: мяшок заўважна цяжэйшы',
+  bagsHint:'Раскідай справы па мяшках. Чым паўнейшы мяшок, тым больш у ім працы. Агульныя справы дзеляцца напалову.',
   tab_scales:'Вагі',nobody:'Нічыя',sharedPool:'🤝 Агульныя (дзеляцца напалову)',basket:'🧺 Карзінка: яшчэ не размеркавана',quickPh:'Закінуць новую справу…',addShort:'Дадаць',
   scalesHint:'Перацягвай справы паміж шалямі, у агульныя ці назад у карзінку. Вага = колькі разоў на тыдзень × цяжкасць. Націсні на справу, каб яе змяніць.',
   balanced:'⚖️ Ураўнаважана',heavier:'Перавес: {x} +{d}',inclShared:'з іх агульных {s}',dropHere:'Кідай сюды'
@@ -172,6 +192,8 @@ uk:{
   wellDone:'Молодець, {x}!',zonesSaved:'Зони збережено',imported:'Імпортовано',badFile:'Не вдалося прочитати файл',resetQ:'Скинути всі справи та історію до початкових?',
   needToken:'Введи token',savedGist:'Збережено в gist',gistErr:'Помилка gist: ',noFile:'немає файлу',loaded:'Завантажено',synced:'✓ синхронізовано',noSync:'⚠ немає синхронізації',
   defB:'Вона',
+  tab_bags:'Мішки',bagsCount:'справ: {n}',bagsEven:'🙂 Приблизно порівну',bagsMore:'{x}: мішок трохи важчий',bagsMuch:'{x}: мішок помітно важчий',
+  bagsHint:'Розкидай справи по мішках. Чим повніший мішок, тим більше в ньому роботи. Спільні справи діляться навпіл.',
   tab_scales:'Терези',nobody:'Нічия',sharedPool:'🤝 Спільні (діляться навпіл)',basket:'🧺 Кошик: ще не розподілено',quickPh:'Закинути нову справу…',addShort:'Додати',
   scalesHint:'Перетягуй справи між шальками, у спільні або назад у кошик. Вага = скільки разів на тиждень × складність. Натисни на справу, щоб її змінити.',
   balanced:'⚖️ Рівновага',heavier:'Перевага: {x} +{d}',inclShared:'з них спільних {s}',dropHere:'Кидай сюди'
@@ -246,7 +268,7 @@ function applyTheme(){document.documentElement.dataset.theme=C.theme==='auto'?''
 function applyLang(){
   document.documentElement.lang=C.lang;document.title=T('app');$('#appName').textContent=T('app');
   document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('on',b.dataset.lang===C.lang));
-  document.querySelectorAll('.tabs button').forEach(b=>b.textContent=T('tab_'+b.dataset.tab));
+  document.querySelectorAll('.tabs button').forEach(b=>{b.textContent=b.dataset.tab==='settings'?'⚙️':T('tab_'+b.dataset.tab);b.title=T('tab_'+b.dataset.tab)});
   $('#addBtn').title=T('add');
 }
 
@@ -275,10 +297,11 @@ function save(){S.updated=Date.now();ls.set(STORE_KEY,S);scheduleSync();render()
 function render(){
   applyLang();
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===UI.tab));
-  ['tasks','scales','balance','settings'].forEach(k=>$('#tab-'+k).hidden=UI.tab!==k);
+  ['tasks','scales','bags','balance','settings'].forEach(k=>$('#tab-'+k).hidden=UI.tab!==k);
   $('#addBtn').hidden=UI.tab!=='tasks';
   if(UI.tab==='tasks')renderTasks();
   if(UI.tab==='scales')renderScales();
+  if(UI.tab==='bags')renderBags();
   if(UI.tab==='balance')renderBalance();
   if(UI.tab==='settings')renderSettings();
 }
@@ -428,17 +451,46 @@ function renderScales(){
       <svg id="scaleSvg" viewBox="0 0 300 136" aria-hidden="true"></svg>
       <div class="pans">${pan('a','panA')}${pan('b','panB')}</div>
     </div>
-    <div class="card pool" data-drop="both"><h3>${T('sharedPool')}</h3>
-      <div class="chips">${shared.map(chipHTML).join('')||`<div class="dropHint">${T('dropHere')}</div>`}</div></div>
-    <div class="card pool basket" data-drop="none"><h3>${T('basket')}</h3>
-      <form id="quickAdd" class="quick"><input type="text" name="q" placeholder="${T('quickPh')}" autocomplete="off"><button class="btn pri">${T('addShort')}</button></form>
-      <div class="chips">${own('none').map(chipHTML).join('')||`<div class="dropHint">${T('dropHere')}</div>`}</div></div>
+    ${poolsHTML()}
     <div class="hint">${T('scalesHint')}</div>`;
   drawBeam(scaleAngle);
   animateBeam(target);
+  bindQuick();
+}
+function poolsHTML(){
+  const shared=S.tasks.filter(t=>t.owner==='both'||t.owner==='rotate'), none=S.tasks.filter(t=>t.owner==='none');
+  const hint=`<div class="dropHint">${T('dropHere')}</div>`;
+  return `<div class="card pool" data-drop="both"><h3>${T('sharedPool')}</h3>
+      <div class="chips">${shared.map(chipHTML).join('')||hint}</div></div>
+    <div class="card pool basket" data-drop="none"><h3>${T('basket')}</h3>
+      <form id="quickAdd" class="quick"><input type="text" name="q" placeholder="${T('quickPh')}" autocomplete="off"><button class="btn pri">${T('addShort')}</button></form>
+      <div class="chips">${none.map(chipHTML).join('')||hint}</div></div>`;
+}
+function bindQuick(){
   $('#quickAdd').onsubmit=e=>{e.preventDefault();const v=e.target.q.value.trim();if(!v)return;
     S.tasks.push({id:uid(),title:v,zone:S.zones[S.zones.length-1]||'',owner:'none',next:C.me,freq:'weekly',effort:1,lastDone:null,lastBy:null,note:''});save();
     setTimeout(()=>$('#quickAdd input')?.focus(),0)};
+}
+function renderBags(){
+  const P=S.people,L=load(),mx=Math.max(L.a,L.b,1),tot=L.a+L.b;
+  const own=k=>S.tasks.filter(t=>t.owner===k);
+  let mood=T('bagsEven');
+  if(tot){const d=Math.abs(L.a-L.b)/tot,x=L.a>L.b?P.a.name:P.b.name;if(d>0.25)mood=T('bagsMuch',{x});else if(d>0.08)mood=T('bagsMore',{x})}
+  const sack=k=>{const fill=Math.round(12+78*(L[k]/mx));return `<div class="sackWrap">
+      <svg class="tie" viewBox="0 0 60 26" aria-hidden="true"><path d="M8 22 Q30 8 52 22" /><path d="M24 14 q-10 -12 -16 -6 q4 6 16 6 M36 14 q10 -12 16 -6 q-4 6 -16 6"/></svg>
+      <div class="sack" data-drop="${k}" style="--c:${P[k].color};--fill:${fill}%">
+        <div class="sackFill"></div>
+        <div class="sackHead"><b style="color:${P[k].color}">${esc(P[k].name)}</b><span>${T('bagsCount',{n:own(k).length})}</span></div>
+        <div class="chips">${own(k).map(chipHTML).join('')||`<div class="dropHint">${T('dropHere')}</div>`}</div>
+      </div></div>`};
+  $('#tab-bags').innerHTML=`
+    <div class="card bags">
+      <div class="verdict mood">${esc(mood)}</div>
+      <div class="sacks">${sack('a')}${sack('b')}</div>
+    </div>
+    ${poolsHTML()}
+    <div class="hint">${T('bagsHint')}</div>`;
+  bindQuick();
 }
 window.addEventListener('resize',()=>{if(UI.tab==='scales')drawBeam(scaleAngle)});
 
