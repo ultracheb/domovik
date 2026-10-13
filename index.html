@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Дамавік</title>
+<title>Напалам</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
 <style>
 :root{--bg:#f6f3ee;--card:#fffdf9;--ink:#2b2622;--muted:#8a8077;--line:#e7e0d6;--chip:#efe9e0;--a:#e07a5f;--b:#5b8e7d}
@@ -63,13 +63,13 @@ dialog input{width:100%;padding:9px 11px;border:1px solid var(--line);border-rad
 
 <script>
 const I18N={
- be:{app:'Дамавік',hint:'Перацягвай справы паміж спісамі. Націсні на імя, каб змяніць.',addPh:'+ дадаць справу',settings:'Налады',lang:'Мова',
+ be:{app:'Напалам',hint:'Перацягвай справы паміж спісамі. Націсні на імя, каб змяніць.',addPh:'+ дадаць справу',settings:'Налады',lang:'Мова',
    tokenLbl:'GitHub token (толькі права gist)',gistPh:'пуста = стварыць новы',save:'Захаваць у gist',create:'Стварыць gist',load:'Загрузіць з gist',close:'Закрыць',
    needToken:'Спачатку ўвядзі token',needGist:'Увядзі Gist ID або націсні «Стварыць gist»',busy:'Чакай…',created:'✓ Gist створаны',saved:'✓ Захавана',loaded:'✓ Загружана',err:'Памылка',badToken:'Токен не падышоў (401). Правер, што ў яго ёсць права gist',notFound:'Gist не знойдзены (404). Правер ID',offline:'Няма сувязі з GitHub',
    syncHint:'Каб бачыць адны і тыя ж спісы на двух тэлефонах, увядзіце той жа token і Gist ID.',synced:'✓',noSync:'⚠ няма сінхры',
    seedA:['Вынесці смецце','Пыласос','Памыць ванну','Аплаціць рахункі','Развесіць бялізну'],
    seedB:['Памыць посуд','Выцерці пыл','Запусціць пральку','Паліць кветкі','Закупка прадуктаў'],nameB:'Яна'},
- uk:{app:'Домовик',hint:'Перетягуй справи між списками. Натисни на ім\'я, щоб змінити.',addPh:'+ додати справу',settings:'Налаштування',lang:'Мова',
+ uk:{app:'Напалам',hint:'Перетягуй справи між списками. Натисни на ім\'я, щоб змінити.',addPh:'+ додати справу',settings:'Налаштування',lang:'Мова',
    tokenLbl:'GitHub token (лише право gist)',gistPh:'порожньо = створити новий',save:'Зберегти в gist',create:'Створити gist',load:'Завантажити з gist',close:'Закрити',
    needToken:'Спочатку введи token',needGist:'Введи Gist ID або натисни «Створити gist»',busy:'Зачекай…',created:'✓ Gist створено',saved:'✓ Збережено',loaded:'✓ Завантажено',err:'Помилка',badToken:'Токен не підійшов (401). Перевір, що в нього є право gist',notFound:'Gist не знайдено (404). Перевір ID',offline:'Немає звʼязку з GitHub',
    syncHint:'Щоб бачити ті самі списки на двох телефонах, введіть той самий token і Gist ID.',synced:'✓',noSync:'⚠ немає синхронізації',
@@ -190,7 +190,7 @@ function errMsg(e){return e===401||e===403?T('badToken'):e===404?T('notFound'):t
 async function push(){
   if(!C.token)return T('needToken');
   try{
-    const body=JSON.stringify({description:'Дамавік',public:false,files:{[FILE]:{content:JSON.stringify(S)}}});
+    const body=JSON.stringify({description:'Напалам',public:false,files:{[FILE]:{content:JSON.stringify(S)}}});
     const r=C.gist?await gh('/gists/'+C.gist,{method:'PATCH',body}):await gh('/gists',{method:'POST',body});
     if(!r.ok)throw r.status;const j=await r.json();if(!C.gist){C.gist=j.id;ls.set(CFG,C)}
     $('#syncState').textContent=T('synced');return true;
