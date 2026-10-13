@@ -6,639 +6,209 @@
 <title>Дамавік</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
 <style>
-:root{
-  --bg:#f6f3ee; --card:#fffdf9; --ink:#2b2622; --muted:#8a8077; --line:#e7e0d6;
-  --a:#e07a5f; --b:#5b8e7d; --both:#9a7fc4; --rot:#d4a24c;
-  --warn:#d9534f; --soon:#e0a03a; --ok:#6aa36f; --chip:#efe9e0;
-  --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.04);
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#1c1a18; --card:#262321; --ink:#efe9e2; --muted:#9a9088; --line:#36312d; --chip:#302c29;
-    --shadow:0 1px 2px rgba(0,0,0,.3);
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#1c1a18; --card:#262321; --ink:#efe9e2; --muted:#9a9088; --line:#36312d; --chip:#302c29;
-  --shadow:0 1px 2px rgba(0,0,0,.3);
-}
+:root{--bg:#f6f3ee;--card:#fffdf9;--ink:#2b2622;--muted:#8a8077;--line:#e7e0d6;--chip:#efe9e0;--a:#e07a5f;--b:#5b8e7d}
+@media (prefers-color-scheme: dark){:root{--bg:#1c1a18;--card:#262321;--ink:#efe9e2;--muted:#9a9088;--line:#36312d;--chip:#302c29}}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer}
-.wrap{max-width:760px;margin:0 auto;padding:16px 16px 96px}
-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-header h1{font-size:22px;margin:0;flex:1}
+html,body{margin:0;overflow-x:hidden;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input{font:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+h1{font-size:22px;margin:0;flex:1}
 .sync{font-size:12px;color:var(--muted)}
-.tabs{display:flex;gap:6px;background:var(--chip);padding:4px;border-radius:12px;margin-bottom:12px}
-.tabs button{flex:1;border:0;background:none;padding:8px;border-radius:9px;color:var(--muted)}
-.tabs button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow);font-weight:600}
-.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.chip{border:1px solid var(--line);background:var(--card);padding:5px 11px;border-radius:999px;font-size:13px;color:var(--muted)}
-.chip.on{color:var(--ink);border-color:var(--ink);font-weight:600}
-.spacer{flex:1}
-.zone{margin:18px 0 6px;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.task{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
-.task .main{flex:1;min-width:0}
-.task .t{font-weight:600;overflow:hidden;text-overflow:ellipsis}
-.task .meta{font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
-.due-over{color:var(--warn);font-weight:600}
-.due-soon{color:var(--soon);font-weight:600}
-.due-ok{color:var(--ok)}
-.pill{border:0;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
-.done{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:none;font-size:17px;flex:none}
-.done:hover{border-color:var(--ok);color:var(--ok)}
-.done.flash{background:var(--ok);border-color:var(--ok);color:#fff}
-.edit{border:0;background:none;color:var(--muted);font-size:18px;padding:4px;flex:none}
-.dots{letter-spacing:1px}
-.fab{position:fixed;right:max(16px,calc(50% - 364px));bottom:20px;width:56px;height:56px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);font-size:28px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
-.card h3{margin:0 0 10px;font-size:15px}
-.bar{display:flex;height:28px;border-radius:8px;overflow:hidden;background:var(--chip)}
-.bar div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;transition:width .3s}
-.legend{display:flex;justify-content:space-between;font-size:13px;margin-top:6px;color:var(--muted)}
-.hint{font-size:12px;color:var(--muted);margin-top:8px}
-.log{font-size:13px;max-height:260px;overflow:auto}
-.log div{padding:5px 0;border-bottom:1px solid var(--line);display:flex;gap:8px}
-.log span:last-child{margin-left:auto;color:var(--muted);white-space:nowrap}
-label.f{display:block;font-size:12px;color:var(--muted);margin:12px 0 4px}
-input[type=text],input[type=password],select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
-textarea{min-height:60px;resize:vertical}
-.seg{display:flex;gap:4px;flex-wrap:wrap}
-.seg button{flex:1;min-width:max-content;border:1px solid var(--line);background:var(--bg);padding:7px 9px;border-radius:9px;font-size:13px}
-.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.btn{border:1px solid var(--line);background:var(--bg);padding:9px 14px;border-radius:10px}
-.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.btn.del{color:var(--warn)}
-.btns{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
-dialog{border:0;border-radius:18px;padding:18px;width:min(460px,calc(100vw - 32px));background:var(--card);color:var(--ink)}
+.icon{border:0;background:var(--chip);border-radius:10px;width:36px;height:36px;font-size:17px;cursor:pointer}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}
+.col{min-width:0;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:10px;min-height:200px;transition:border-color .15s,background .15s}
+.col.over{border-color:var(--c)}
+.head{display:flex;align-items:center;gap:6px;margin-bottom:8px;border-bottom:3px solid var(--c);padding-bottom:6px}
+.head input{border:0;background:none;font-weight:700;font-size:16px;width:100%;min-width:0;padding:2px;color:var(--c)}
+.head input:focus{outline:2px solid var(--line);border-radius:6px}
+.head span{color:var(--muted);font-size:13px}
+.list{min-height:40px;display:flex;flex-direction:column;gap:6px}
+.item{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:8px 6px 8px 10px;cursor:grab;user-select:none;touch-action:none;font-size:14px}
+.item .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.item .x{border:0;background:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 4px;opacity:.6}
+.item .x:hover{opacity:1}
+.item.dragging{opacity:.3}
+.ghost{position:fixed;z-index:50;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.25);transform:rotate(-2deg)}
+.placeholder{height:4px;border-radius:2px;background:var(--c)}
+.add{display:flex;gap:6px;margin-top:8px}
+.add input{flex:1;min-width:0;border:1px dashed var(--line);background:none;border-radius:10px;padding:7px 9px;font-size:14px}
+.add input:focus{outline:none;border-style:solid;border-color:var(--c)}
+.hint{color:var(--muted);font-size:12px;text-align:center;margin-top:14px}
+dialog{border:0;border-radius:16px;padding:18px;width:min(420px,calc(100vw - 32px));background:var(--card);color:var(--ink)}
 dialog::backdrop{background:rgba(0,0,0,.35)}
-dialog h2{margin:0;font-size:18px}
-.people{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.color{display:flex;gap:8px;align-items:center}
-.color input[type=color]{width:38px;height:38px;border:0;background:none;padding:0}
-.empty{text-align:center;color:var(--muted);padding:40px 0}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
-.toast.on{opacity:1}
-.lang{display:flex;gap:2px;background:var(--chip);border-radius:8px;padding:2px}.lang button{border:0;background:none;padding:3px 7px;border-radius:6px;font-size:12px;color:var(--muted)}.lang button.on{background:var(--card);color:var(--ink);font-weight:700}
-
-.tabs button{padding:8px 4px;font-size:14px}
-.verdict{text-align:center;font-weight:700;font-size:15px}
-#scaleSvg{width:100%;max-width:520px;display:block;margin:4px auto 0;overflow:visible}
-#scaleSvg .frame line{stroke:var(--muted);stroke-width:3;stroke-linecap:round}
-#scaleSvg .frame line.beam{stroke:var(--ink);stroke-width:5}
-#scaleSvg .pivot{fill:var(--ink)}
-#scaleSvg .bowl{fill:var(--chip);stroke:var(--muted);stroke-width:2}
-.scales{padding-bottom:52px}
-.pans{display:grid;align-items:start;margin-top:-6px!important;grid-template-columns:1fr 1fr;gap:10px;max-width:520px;margin:0 auto}
-.pan{background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:8px;min-height:90px;transition:transform .05s linear,border-color .15s,background .15s}
-.panHead{display:flex;justify-content:space-between;font-weight:700;margin-bottom:2px}
-.panSub{font-size:11px;color:var(--muted);margin-bottom:6px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.tchip{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:9px;padding:5px 8px;font-size:13px;cursor:grab;user-select:none;touch-action:none;display:flex;gap:6px;align-items:center;max-width:100%}
-.tchip b{font-size:11px;color:var(--muted);font-weight:700}
-.tchip.dragging{opacity:.3}
-.tchip.ghost{position:fixed;z-index:50;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.25);transform:rotate(-3deg);cursor:grabbing}
-.pool{border-style:dashed;border-width:2px}
-[data-drop].over{border-color:var(--ink)!important;background:var(--chip)}
-.dropHint{font-size:12px;color:var(--muted);padding:6px 2px}
-.quick{display:flex;gap:6px;margin-bottom:10px}
-.quick input{flex:1}
-
-.tabs{overflow-x:auto;scrollbar-width:none}
-.tabs button{flex:1 0 auto;padding:8px 6px;font-size:13.5px}
-.tabs button[data-tab=settings]{flex:0 0 40px}
-.mood{font-weight:600;margin-bottom:8px}
-.sacks{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
-.sackWrap{display:flex;flex-direction:column;align-items:center}
-.tie{width:56px;height:24px;margin-bottom:-6px;position:relative;z-index:1}
-.tie path{fill:none;stroke:#a4875f;stroke-width:3;stroke-linecap:round}
-.sack{position:relative;width:100%;min-height:230px;padding:18px 10px 16px;background:color-mix(in srgb,#c9a979 22%,var(--card));border:2px solid color-mix(in srgb,#a4875f 55%,var(--line));border-radius:42% 42% 26px 26px / 14% 14% 26px 26px;overflow:hidden;transition:border-color .15s,transform .15s}
-.sackFill{position:absolute;left:0;right:0;bottom:0;height:var(--fill);background:color-mix(in srgb,var(--c) 22%,transparent);transition:height .5s ease}
-.sack>*:not(.sackFill){position:relative}
-.sackHead{display:flex;flex-direction:column;align-items:center;margin-bottom:10px;font-size:13px}
-.sackHead span{color:var(--muted);font-size:12px}
-.sack .chips{justify-content:center}
-.sack.over{transform:scale(1.02)}
+dialog h2{margin:0 0 6px;font-size:17px}
+dialog label{display:block;font-size:12px;color:var(--muted);margin:12px 0 4px}
+dialog input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.seg{display:flex;gap:6px}
+.btn{border:1px solid var(--line);background:var(--bg);padding:8px 12px;border-radius:10px;cursor:pointer}
+.btn.on,.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.status{font-size:13px;margin-top:10px;min-height:1em}.status.ok{color:var(--b)}.status.bad{color:#d9534f}
+.small{font-size:12px;color:var(--muted);margin-top:10px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>🏠 <span id="appName">Дамавік</span></h1>
+    <h1>🏠 <span id="appName"></span></h1>
     <span class="sync" id="syncState"></span>
-    <div class="lang"><button data-lang="be">BE</button><button data-lang="uk">UK</button></div>
+    <button class="icon" id="cfgBtn">⚙️</button>
   </header>
-  <div class="tabs">
-    <button data-tab="scales" class="on"></button>
-    <button data-tab="bags"></button>
-    <button data-tab="tasks"></button>
-    <button data-tab="balance"></button>
-    <button data-tab="settings"></button>
-  </div>
-  <section id="tab-scales"></section>
-  <section id="tab-bags" hidden></section>
-  <section id="tab-tasks" hidden></section>
-  <section id="tab-balance" hidden></section>
-  <section id="tab-settings" hidden></section>
+  <div class="cols" id="cols"></div>
+  <div class="hint" id="hint"></div>
 </div>
-<button class="fab" id="addBtn">+</button>
-<div class="toast" id="toast"></div>
 
-<dialog id="dlg"><form method="dialog" id="form"></form></dialog>
+<dialog id="cfg"><form method="dialog" id="cfgForm"></form></dialog>
 
 <script>
-/* ---------- i18n ---------- */
 const I18N={
-be:{
-  app:'Дамавік',
-  f_daily:'Штодня',f_every3:'Раз на 2-3 дні',f_weekly:'Штотыдзень',f_biweekly:'Раз на 2 тыдні',f_monthly:'Штомесяц',f_asneeded:'Па патрэбе',
-  tab_tasks:'Справы',tab_balance:'Баланс',tab_settings:'Налады',
-  all:'Усе',both:'Разам',rotate:'Па чарзе',todo:'🔥 Трэба зрабіць',byZone:'Па зонах',byDue:'Па тэрміне',
-  lastTime:'апошні раз {x}',asNeeded:'па патрэбе',never:'яшчэ не рабілі',overdue:'пратэрмінавана {n} дн.',today:'сёння',tomorrow:'заўтра',inDays:'праз {n} дн.',yesterday:'учора',daysAgo:'{n} дн. таму',
-  empty:'Тут пуста. Можна адпачыць 🙂',markDone:'Зроблена',changeOwner:'Змяніць адказнага',edit:'Рэдагаваць',add:'Дадаць справу',
-  planned:'Плануемая нагрузка',plannedHint:'Лічыцца як частата × цяжкасць. "Разам" і "па чарзе" дзеляцца напалову. Сваіх спраў: {a} {na}, {b} {nb}, агульных {n}.',
-  done7:'Рэальна зроблена за 7 дзён',done30:'За 30 дзён',nothingYet:'Пакуль нічога не адзначана.',history:'Гісторыя',deleted:'(выдалена)',emptyShort:'Пуста',
-  us:'Мы',whoMe:'Хто карыстаецца гэтай прыладай (каму залічваць ✓)',language:'Мова',zones:'Зоны',zonesHint:'Адна зона на радок, эмодзі на пачатку па жаданні.',saveZones:'Захаваць зоны',
-  syncTitle:'Сінхранізацыя праз GitHub Gist',tokenLbl:'GitHub token (толькі права gist)',gistPh:'пуста = стварыць новы',gistSave:'Захаваць у gist',gistCreate:'Стварыць gist',gistLoad:'Загрузіць з gist',
-  syncHint:'Пасля налады змены захоўваюцца аўтаматычна, а пры адкрыцці старонка падцягвае свежую версію. Другі чалавек уводзіць той жа token і Gist ID.',
-  other:'Іншае',theme:'Тэма',auto:'Аўта',light:'Светлая',dark:'Цёмная',exp:'Экспарт JSON',imp:'Імпарт JSON',reset:'Скінуць усё',
-  newTask:'Новая справа',what:'Што трэба рабіць',whatPh:'Напр. памыць вокны',zone:'Зона',who:'Хто адказвае',often:'Як часта',hard:'Наколькі цяжка',e1:'● Лёгка',e2:'●● Сярэдне',e3:'●●● Цяжка',
-  note:'Нататка',notePh:'Па жаданні',del:'Выдаліць',cancel:'Адмена',save:'Захаваць',delQ:'Выдаліць справу?',
-  wellDone:'Малайчына, {x}!',zonesSaved:'Зоны захаваныя',imported:'Імпартавана',badFile:'Не атрымалася прачытаць файл',resetQ:'Скінуць усе справы і гісторыю да пачатковых?',
-  needToken:'Увядзі token',savedGist:'Захавана ў gist',gistErr:'Памылка gist: ',noFile:'няма файла',loaded:'Загружана',synced:'✓ сінхранізавана',noSync:'⚠ няма сінхры',
-  defB:'Яна',
-  tab_bags:'Мяшкі',bagsCount:'спраў: {n}',bagsEven:'🙂 Прыкладна пароўну',bagsMore:'{x}: мяшок крыху цяжэйшы',bagsMuch:'{x}: мяшок заўважна цяжэйшы',
-  bagsHint:'Раскідай справы па мяшках. Чым паўнейшы мяшок, тым больш у ім працы. Агульныя справы дзеляцца напалову.',
-  tab_scales:'Вагі',nobody:'Нічыя',sharedPool:'🤝 Агульныя (дзеляцца напалову)',basket:'🧺 Карзінка: яшчэ не размеркавана',quickPh:'Закінуць новую справу…',addShort:'Дадаць',
-  scalesHint:'Перацягвай справы паміж шалямі, у агульныя ці назад у карзінку. Вага = колькі разоў на тыдзень × цяжкасць. Націсні на справу, каб яе змяніць.',
-  balanced:'⚖️ Ураўнаважана',heavier:'Перавес: {x} +{d}',inclShared:'з іх агульных {s}',dropHere:'Кідай сюды'
-},
-uk:{
-  app:'Домовик',
-  f_daily:'Щодня',f_every3:'Раз на 2-3 дні',f_weekly:'Щотижня',f_biweekly:'Раз на 2 тижні',f_monthly:'Щомісяця',f_asneeded:'За потреби',
-  tab_tasks:'Справи',tab_balance:'Баланс',tab_settings:'Налаштування',
-  all:'Усі',both:'Разом',rotate:'По черзі',todo:'🔥 Треба зробити',byZone:'За зонами',byDue:'За терміном',
-  lastTime:'востаннє {x}',asNeeded:'за потреби',never:'ще не робили',overdue:'прострочено на {n} дн.',today:'сьогодні',tomorrow:'завтра',inDays:'через {n} дн.',yesterday:'вчора',daysAgo:'{n} дн. тому',
-  empty:'Тут порожньо. Можна відпочити 🙂',markDone:'Зроблено',changeOwner:'Змінити відповідального',edit:'Редагувати',add:'Додати справу',
-  planned:'Заплановане навантаження',plannedHint:'Рахується як частота × складність. "Разом" і "по черзі" діляться навпіл. Своїх справ: {a} {na}, {b} {nb}, спільних {n}.',
-  done7:'Реально зроблено за 7 днів',done30:'За 30 днів',nothingYet:'Поки нічого не відмічено.',history:'Історія',deleted:'(видалено)',emptyShort:'Порожньо',
-  us:'Ми',whoMe:'Хто користується цим пристроєм (кому зараховувати ✓)',language:'Мова',zones:'Зони',zonesHint:'Одна зона на рядок, емодзі на початку за бажанням.',saveZones:'Зберегти зони',
-  syncTitle:'Синхронізація через GitHub Gist',tokenLbl:'GitHub token (лише право gist)',gistPh:'порожньо = створити новий',gistSave:'Зберегти в gist',gistCreate:'Створити gist',gistLoad:'Завантажити з gist',
-  syncHint:'Після налаштування зміни зберігаються автоматично, а при відкритті сторінка підтягує свіжу версію. Друга людина вводить той самий token і Gist ID.',
-  other:'Інше',theme:'Тема',auto:'Авто',light:'Світла',dark:'Темна',exp:'Експорт JSON',imp:'Імпорт JSON',reset:'Скинути все',
-  newTask:'Нова справа',what:'Що треба зробити',whatPh:'Напр. помити вікна',zone:'Зона',who:'Хто відповідає',often:'Як часто',hard:'Наскільки важко',e1:'● Легко',e2:'●● Середньо',e3:'●●● Важко',
-  note:'Нотатка',notePh:'За бажанням',del:'Видалити',cancel:'Скасувати',save:'Зберегти',delQ:'Видалити справу?',
-  wellDone:'Молодець, {x}!',zonesSaved:'Зони збережено',imported:'Імпортовано',badFile:'Не вдалося прочитати файл',resetQ:'Скинути всі справи та історію до початкових?',
-  needToken:'Введи token',savedGist:'Збережено в gist',gistErr:'Помилка gist: ',noFile:'немає файлу',loaded:'Завантажено',synced:'✓ синхронізовано',noSync:'⚠ немає синхронізації',
-  defB:'Вона',
-  tab_bags:'Мішки',bagsCount:'справ: {n}',bagsEven:'🙂 Приблизно порівну',bagsMore:'{x}: мішок трохи важчий',bagsMuch:'{x}: мішок помітно важчий',
-  bagsHint:'Розкидай справи по мішках. Чим повніший мішок, тим більше в ньому роботи. Спільні справи діляться навпіл.',
-  tab_scales:'Терези',nobody:'Нічия',sharedPool:'🤝 Спільні (діляться навпіл)',basket:'🧺 Кошик: ще не розподілено',quickPh:'Закинути нову справу…',addShort:'Додати',
-  scalesHint:'Перетягуй справи між шальками, у спільні або назад у кошик. Вага = скільки разів на тиждень × складність. Натисни на справу, щоб її змінити.',
-  balanced:'⚖️ Рівновага',heavier:'Перевага: {x} +{d}',inclShared:'з них спільних {s}',dropHere:'Кидай сюди'
-}};
-/* seed zones & tasks in both languages; untouched seed items follow the current language */
-const SEED_ZONES={
-  kitchen:{be:'🍳 Кухня',uk:'🍳 Кухня'},bath:{be:'🛁 Ванная',uk:'🛁 Ванна'},rooms:{be:'🛋 Пакоі',uk:'🛋 Кімнати'},
-  laundry:{be:'🧺 Пранне',uk:'🧺 Прання'},shop:{be:'🛒 Пакупкі і рахункі',uk:'🛒 Покупки й рахунки'},misc:{be:'🌿 Іншае',uk:'🌿 Інше'}
+ be:{app:'Дамавік',hint:'Перацягвай справы паміж спісамі. Націсні на імя, каб змяніць.',addPh:'+ дадаць справу',settings:'Налады',lang:'Мова',
+   tokenLbl:'GitHub token (толькі права gist)',gistPh:'пуста = стварыць новы',save:'Захаваць у gist',create:'Стварыць gist',load:'Загрузіць з gist',close:'Закрыць',
+   needToken:'Спачатку ўвядзі token',needGist:'Увядзі Gist ID або націсні «Стварыць gist»',busy:'Чакай…',created:'✓ Gist створаны',saved:'✓ Захавана',loaded:'✓ Загружана',err:'Памылка',badToken:'Токен не падышоў (401). Правер, што ў яго ёсць права gist',notFound:'Gist не знойдзены (404). Правер ID',offline:'Няма сувязі з GitHub',
+   syncHint:'Каб бачыць адны і тыя ж спісы на двух тэлефонах, увядзіце той жа token і Gist ID.',synced:'✓',noSync:'⚠ няма сінхры',
+   seedA:['Вынесці смецце','Пыласос','Памыць ванну','Аплаціць рахункі','Развесіць бялізну'],
+   seedB:['Памыць посуд','Выцерці пыл','Запусціць пральку','Паліць кветкі','Закупка прадуктаў'],nameB:'Яна'},
+ uk:{app:'Домовик',hint:'Перетягуй справи між списками. Натисни на ім\'я, щоб змінити.',addPh:'+ додати справу',settings:'Налаштування',lang:'Мова',
+   tokenLbl:'GitHub token (лише право gist)',gistPh:'порожньо = створити новий',save:'Зберегти в gist',create:'Створити gist',load:'Завантажити з gist',close:'Закрити',
+   needToken:'Спочатку введи token',needGist:'Введи Gist ID або натисни «Створити gist»',busy:'Зачекай…',created:'✓ Gist створено',saved:'✓ Збережено',loaded:'✓ Завантажено',err:'Помилка',badToken:'Токен не підійшов (401). Перевір, що в нього є право gist',notFound:'Gist не знайдено (404). Перевір ID',offline:'Немає звʼязку з GitHub',
+   syncHint:'Щоб бачити ті самі списки на двох телефонах, введіть той самий token і Gist ID.',synced:'✓',noSync:'⚠ немає синхронізації',
+   seedA:['Винести сміття','Пилосос','Помити ванну','Оплатити рахунки','Розвісити білизну'],
+   seedB:['Помити посуд','Витерти пил','Запустити пральку','Полити квіти','Закупівля продуктів'],nameB:'Вона'}
 };
-const SEED_TASKS={
-  dishes:{be:'Памыць посуд / пасудамыйка',uk:'Помити посуд / посудомийка'},
-  stove:{be:'Выцерці стол і пліту',uk:'Протерти стіл і плиту'},
-  trash:{be:'Вынесці смецце',uk:'Винести сміття'},
-  fridge:{be:'Разабраць халадзільнік',uk:'Розібрати холодильник'},
-  tub:{be:'Памыць ванну і ракавіну',uk:'Помити ванну й раковину'},
-  wc:{be:'Памыць унітаз',uk:'Помити унітаз'},
-  towels:{be:'Змяніць ручнікі',uk:'Змінити рушники'},
-  vacuum:{be:'Пыласос',uk:'Пилосос'},
-  floor:{be:'Памыць падлогу',uk:'Помити підлогу'},
-  dust:{be:'Выцерці пыл',uk:'Витерти пил'},
-  bedding:{be:'Змяніць пасцельную бялізну',uk:'Змінити постільну білизну'},
-  wash:{be:'Запусціць пральку',uk:'Запустити пральку'},
-  fold:{be:'Развесіць і скласці бялізну',uk:'Розвісити й скласти білизну'},
-  groceries:{be:'Закупка прадуктаў',uk:'Закупівля продуктів'},
-  bills:{be:'Аплаціць рахункі',uk:'Оплатити рахунки'},
-  plants:{be:'Паліць кветкі',uk:'Полити квіти'}
-};
-
-const FREQ={daily:{days:1,w:7},every3:{days:3,w:2.5},weekly:{days:7,w:1},biweekly:{days:14,w:.5},monthly:{days:30,w:.25},asneeded:{days:0,w:.5}};
-const STORE_KEY='domovik-v1', CFG_KEY='domovik-cfg', GIST_FILE='domovik.json';
-const uid=()=>Math.random().toString(36).slice(2,9);
-const DAY=864e5;
-
+const KEY='domovik-v2',CFG='domovik-cfg',FILE='domovik.json';
 const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let C=Object.assign({me:'a',token:'',gist:'',theme:'auto',lang:(navigator.language||'').startsWith('uk')?'uk':'be'},ls.get(CFG_KEY)||{});
-const T=(k,v={})=>(I18N[C.lang][k]??I18N.be[k]??k).replace(/\{(\w+)\}/g,(_,m)=>v[m]??'');
-const fl=k=>T('f_'+k);
-
-/* zone display: a seed zone name in either language shows in the current one */
-function zl(z){for(const v of Object.values(SEED_ZONES))if(v.be===z||v.uk===z)return v[C.lang];return z}
-const tt=t=>t.sk&&SEED_TASKS[t.sk]?SEED_TASKS[t.sk][C.lang]:t.title;
-
-function seed(){
-  const Z=k=>SEED_ZONES[k][C.lang];
-  const t=(sk,zone,owner,freq,effort)=>({id:uid(),sk,title:SEED_TASKS[sk][C.lang],zone:Z(zone),owner,next:'a',freq,effort,lastDone:null,lastBy:null,note:''});
-  return {
-    people:{a:{name:'Уладзь',color:'#e07a5f'},b:{name:T('defB'),color:'#5b8e7d'}},
-    zones:Object.keys(SEED_ZONES).map(Z),
-    tasks:[
-      t('dishes','kitchen','rotate','daily',1),t('stove','kitchen','rotate','daily',1),t('trash','kitchen','a','every3',1),t('fridge','kitchen','b','monthly',2),
-      t('tub','bath','a','weekly',2),t('wc','bath','b','weekly',2),t('towels','bath','b','weekly',1),
-      t('vacuum','rooms','a','weekly',2),t('floor','rooms','rotate','biweekly',3),t('dust','rooms','b','biweekly',1),t('bedding','rooms','both','biweekly',2),
-      t('wash','laundry','b','weekly',1),t('fold','laundry','a','weekly',2),
-      t('groceries','shop','both','weekly',2),t('bills','shop','a','monthly',1),
-      t('plants','misc','b','every3',1)
-    ],
-    log:[],updated:Date.now()
-  };
-}
-
-let S=ls.get(STORE_KEY);
-if(!S)S=seed();
-else{ /* migrate v1 data: tag untouched seed tasks so they translate */
-  S.tasks.forEach(t=>{if(!t.sk)for(const[k,v]of Object.entries(SEED_TASKS))if(v.be===t.title||v.uk===t.title){t.sk=k;break}});
-}
-let UI={tab:'scales',filter:'all',group:'zone'};
-
+let C=Object.assign({token:'',gist:'',lang:(navigator.language||'').startsWith('uk')?'uk':'be'},ls.get(CFG)||{});
+const T=k=>I18N[C.lang][k];
+const uid=()=>Math.random().toString(36).slice(2,9);
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),1800)}
-function applyTheme(){document.documentElement.dataset.theme=C.theme==='auto'?'':C.theme}
-function applyLang(){
-  document.documentElement.lang=C.lang;document.title=T('app');$('#appName').textContent=T('app');
-  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('on',b.dataset.lang===C.lang));
-  document.querySelectorAll('.tabs button').forEach(b=>{b.textContent=b.dataset.tab==='settings'?'⚙️':T('tab_'+b.dataset.tab);b.title=T('tab_'+b.dataset.tab)});
-  $('#addBtn').title=T('add');
-}
 
-function ownerInfo(o,task){
-  const P=S.people;
-  if(o==='a'||o==='b')return{label:P[o].name,color:P[o].color};
-  if(o==='both')return{label:T('both'),color:'var(--both)'};
-  if(o==='none')return{label:T('nobody'),color:'var(--muted)'};
-  return{label:'🔄 '+P[task?.next||'a'].name,color:'var(--rot)'};
+function seed(){return{names:{a:'Уладзь',b:T('nameB')},a:T('seedA').map(t=>({id:uid(),t})),b:T('seedB').map(t=>({id:uid(),t})),updated:Date.now()}}
+/* accept data from the old, bigger version too */
+function normalize(d){
+  if(d&&Array.isArray(d.a)&&Array.isArray(d.b))return d;
+  if(d&&Array.isArray(d.tasks)){
+    const n={names:{a:d.people?.a?.name||'Уладзь',b:d.people?.b?.name||T('nameB')},a:[],b:[],updated:d.updated||Date.now()};
+    d.tasks.forEach(x=>{const k=x.owner==='a'||x.owner==='b'?x.owner:(n.a.length<=n.b.length?'a':'b');n[k].push({id:x.id||uid(),t:x.title})});
+    return n;
+  }
+  return seed();
 }
-function ago(ts){const d=Math.floor((Date.now()-ts)/DAY);return d<=0?T('today'):d===1?T('yesterday'):T('daysAgo',{n:d})}
-function dueInfo(t){
-  const f=FREQ[t.freq];
-  if(!f.days)return{txt:t.lastDone?T('lastTime',{x:ago(t.lastDone)}):T('asNeeded'),cls:'',score:9999};
-  if(!t.lastDone)return{txt:T('never'),cls:'due-soon',score:-1};
-  const left=Math.round((t.lastDone+f.days*DAY-Date.now())/DAY);
-  if(left<0)return{txt:T('overdue',{n:-left}),cls:'due-over',score:left};
-  if(left===0)return{txt:T('today'),cls:'due-soon',score:0};
-  if(left===1)return{txt:T('tomorrow'),cls:'due-soon',score:1};
-  return{txt:T('inDays',{n:left}),cls:'due-ok',score:left};
-}
+let S=normalize(ls.get(KEY));
 
-function save(){S.updated=Date.now();ls.set(STORE_KEY,S);scheduleSync();render()}
+function save(){S.updated=Date.now();ls.set(KEY,S);render();scheduleSync()}
 
-/* ---------- render ---------- */
 function render(){
-  applyLang();
-  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===UI.tab));
-  ['tasks','scales','bags','balance','settings'].forEach(k=>$('#tab-'+k).hidden=UI.tab!==k);
-  $('#addBtn').hidden=UI.tab!=='tasks';
-  if(UI.tab==='tasks')renderTasks();
-  if(UI.tab==='scales')renderScales();
-  if(UI.tab==='bags')renderBags();
-  if(UI.tab==='balance')renderBalance();
-  if(UI.tab==='settings')renderSettings();
+  document.documentElement.lang=C.lang;document.title=T('app');$('#appName').textContent=T('app');$('#hint').textContent=T('hint');
+  $('#cols').innerHTML=['a','b'].map(k=>`
+    <div class="col" data-k="${k}" style="--c:var(--${k})">
+      <div class="head"><input data-name="${k}" value="${esc(S.names[k])}" aria-label="name"><span>${S[k].length}</span></div>
+      <div class="list">${S[k].map(it=>`<div class="item" data-id="${it.id}"><span class="t">${esc(it.t)}</span><button class="x" data-del="${it.id}" aria-label="delete">×</button></div>`).join('')}</div>
+      <form class="add" data-add="${k}"><input name="q" placeholder="${T('addPh')}" autocomplete="off"></form>
+    </div>`).join('');
 }
 
-function taskHTML(t){
-  const o=ownerInfo(t.owner,t), d=dueInfo(t);
-  return `<div class="task">
-    <button class="done" data-done="${t.id}" title="${T('markDone')}">✓</button>
-    <div class="main">
-      <div class="t">${esc(tt(t))}</div>
-      <div class="meta"><span class="${d.cls}">${d.txt}</span><span>${fl(t.freq)}</span><span class="dots">${'●'.repeat(t.effort)}${'○'.repeat(3-t.effort)}</span>${UI.group==='due'?`<span>${esc(zl(t.zone))}</span>`:''}</div>
-    </div>
-    <button class="pill" style="background:${o.color}" data-cycle="${t.id}" title="${T('changeOwner')}">${esc(o.label)}</button>
-    <button class="edit" data-edit="${t.id}" title="${T('edit')}">⋯</button>
-  </div>`;
-}
+/* edits */
+document.addEventListener('submit',e=>{
+  const k=e.target.dataset.add;if(!k)return;e.preventDefault();
+  const v=e.target.q.value.trim();if(!v)return;
+  S[k].push({id:uid(),t:v});save();$(`[data-add="${k}"] input`).focus();
+});
+document.addEventListener('change',e=>{const k=e.target.dataset.name;if(k){S.names[k]=e.target.value.trim()||S.names[k];save()}});
+document.addEventListener('click',e=>{
+  const id=e.target.dataset.del;if(!id)return;
+  ['a','b'].forEach(k=>S[k]=S[k].filter(x=>x.id!==id));save();
+});
 
-function renderTasks(){
-  const P=S.people;
-  const filters=[['all',T('all')],['a',P.a.name],['b',P.b.name],['both',T('both')],['rotate',T('rotate')],['due',T('todo')]];
-  let list=S.tasks.filter(t=>{
-    if(UI.filter==='all')return true;
-    if(UI.filter==='due')return dueInfo(t).score<=1;
-    if(UI.filter==='a'||UI.filter==='b')return t.owner===UI.filter||t.owner==='both'||(t.owner==='rotate'&&t.next===UI.filter);
-    return t.owner===UI.filter;
-  });
-  let body='';
-  if(!list.length)body=`<div class="empty">${T('empty')}</div>`;
-  else if(UI.group==='zone'){
-    const zones=[...S.zones,...new Set(list.map(t=>t.zone).filter(z=>!S.zones.includes(z)))];
-    zones.forEach(z=>{const ts=list.filter(t=>t.zone===z);if(ts.length)body+=`<div class="zone">${esc(zl(z))}</div>`+ts.map(taskHTML).join('')});
-  } else body=list.slice().sort((x,y)=>dueInfo(x).score-dueInfo(y).score).map(taskHTML).join('');
-  $('#tab-tasks').innerHTML=`
-    <div class="row">${filters.map(([k,l])=>`<button class="chip ${UI.filter===k?'on':''}" data-filter="${k}">${esc(l)}</button>`).join('')}</div>
-    <div class="row"><span class="spacer"></span>
-      <button class="chip ${UI.group==='zone'?'on':''}" data-group="zone">${T('byZone')}</button>
-      <button class="chip ${UI.group==='due'?'on':''}" data-group="due">${T('byDue')}</button>
-    </div>${body}`;
-}
-
-function load(){
-  const L={a:0,b:0};
-  S.tasks.forEach(t=>{const w=tw(t);if(t.owner==='a'||t.owner==='b')L[t.owner]+=w;else if(t.owner!=='none'){L.a+=w/2;L.b+=w/2}});
-  return L;
-}
-function bar(a,b){
-  const P=S.people,tot=a+b||1,pa=Math.round(a/tot*100);
-  return `<div class="bar"><div style="width:${pa}%;background:${P.a.color}">${pa}%</div><div style="width:${100-pa}%;background:${P.b.color}">${100-pa}%</div></div>
-  <div class="legend"><span>${esc(P.a.name)}</span><span>${esc(P.b.name)}</span></div>`;
-}
-function renderBalance(){
-  const P=S.people,L=load();
-  const cnt=(from)=>{const c={a:0,b:0};S.log.filter(e=>e.ts>=from).forEach(e=>{const t=S.tasks.find(x=>x.id===e.taskId);c[e.by]+=t?t.effort:1});return c};
-  const w=cnt(Date.now()-7*DAY),m=cnt(Date.now()-30*DAY);
-  const own=k=>S.tasks.filter(t=>t.owner===k).length;
-  const none=`<div class="hint">${T('nothingYet')}</div>`;
-  $('#tab-balance').innerHTML=`
-    <div class="card"><h3>${T('planned')}</h3>${bar(L.a,L.b)}
-      <div class="hint">${esc(T('plannedHint',{a:P.a.name,na:own('a'),b:P.b.name,nb:own('b'),n:own('both')+own('rotate')}))}</div></div>
-    <div class="card"><h3>${T('done7')}</h3>${w.a+w.b?bar(w.a,w.b):none}</div>
-    <div class="card"><h3>${T('done30')}</h3>${m.a+m.b?bar(m.a,m.b):none}</div>
-    <div class="card"><h3>${T('history')}</h3><div class="log">${S.log.slice().reverse().slice(0,60).map(e=>{
-      const t=S.tasks.find(x=>x.id===e.taskId);
-      return `<div><span style="color:${P[e.by].color};font-weight:600">${esc(P[e.by].name)}</span><span>${esc(t?tt(t):T('deleted'))}</span><span>${new Date(e.ts).toLocaleDateString(C.lang,{day:'numeric',month:'short'})}</span></div>`}).join('')||`<div class="hint">${T('emptyShort')}</div>`}</div></div>`;
-}
-
-function renderSettings(){
-  const P=S.people;
-  $('#tab-settings').innerHTML=`
-    <div class="card"><h3>${T('us')}</h3>
-      <div class="people">${['a','b'].map(k=>`<div><div class="color"><input type="color" value="${P[k].color}" data-pcolor="${k}"><input type="text" value="${esc(P[k].name)}" data-pname="${k}"></div></div>`).join('')}</div>
-      <label class="f">${T('whoMe')}</label>
-      <div class="seg">${['a','b'].map(k=>`<button type="button" class="${C.me===k?'on':''}" data-me="${k}">${esc(P[k].name)}</button>`).join('')}</div>
-      <label class="f">${T('language')}</label>
-      <div class="seg"><button type="button" class="${C.lang==='be'?'on':''}" data-lang="be">Беларуская</button><button type="button" class="${C.lang==='uk'?'on':''}" data-lang="uk">Українська</button></div>
-    </div>
-    <div class="card"><h3>${T('zones')}</h3>
-      <textarea id="zones" rows="6">${esc(S.zones.map(zl).join('\n'))}</textarea>
-      <div class="hint">${T('zonesHint')}</div>
-      <div class="btns"><button class="btn" id="saveZones">${T('saveZones')}</button></div>
-    </div>
-    <div class="card"><h3>${T('syncTitle')}</h3>
-      <label class="f">${T('tokenLbl')}</label>
-      <input type="password" id="token" value="${esc(C.token)}" placeholder="ghp_...">
-      <label class="f">Gist ID</label>
-      <input type="text" id="gist" value="${esc(C.gist)}" placeholder="${T('gistPh')}">
-      <div class="btns">
-        <button class="btn pri" id="gistSave">${C.gist?T('gistSave'):T('gistCreate')}</button>
-        <button class="btn" id="gistLoad" ${C.gist?'':'disabled'}>${T('gistLoad')}</button>
-      </div>
-      <div class="hint">${T('syncHint')}</div>
-    </div>
-    <div class="card"><h3>${T('other')}</h3>
-      <label class="f">${T('theme')}</label>
-      <div class="seg">${['auto','light','dark'].map(k=>`<button type="button" class="${C.theme===k?'on':''}" data-theme-set="${k}">${T(k)}</button>`).join('')}</div>
-      <div class="btns">
-        <button class="btn" id="exp">${T('exp')}</button>
-        <button class="btn" id="imp">${T('imp')}</button>
-        <button class="btn del" id="reset">${T('reset')}</button>
-      </div>
-    </div>`;
-}
-
-/* ---------- scales ---------- */
-function tw(t){return FREQ[t.freq].w*t.effort}
-const fmt=n=>(Math.round(n*10)/10).toString().replace('.',',');
-let scaleAngle=0, scaleAnim=null;
-function drawBeam(a){
-  const svg=$('#scaleSvg');if(!svg)return;
-  const r=a*Math.PI/180, L=118, cx=150, cy=44, dx=L*Math.cos(r), dy=L*Math.sin(r);
-  const lx=cx-dx, ly=cy-dy, rx=cx+dx, ry=cy+dy, s=34;
-  const bowl=(x,y)=>`<line x1="${x}" y1="${y}" x2="${x-26}" y2="${y+s}"/><line x1="${x}" y1="${y}" x2="${x+26}" y2="${y+s}"/><path d="M${x-34} ${y+s} Q${x} ${y+s+18} ${x+34} ${y+s}Z" class="bowl"/>`;
-  svg.innerHTML=`<g class="frame"><line x1="${cx}" y1="${cy}" x2="${cx}" y2="132"/><line x1="${cx-34}" y1="132" x2="${cx+34}" y2="132"/>
-    <line x1="${lx}" y1="${ly}" x2="${rx}" y2="${ry}" class="beam"/><circle cx="${cx}" cy="${cy}" r="5" class="pivot"/>
-    ${bowl(lx,ly)}${bowl(rx,ry)}</g>`;
-  const k=svg.getBoundingClientRect().width/300||1;
-  const pa=$('#panA'),pb=$('#panB');
-  if(pa)pa.style.transform=`translateY(${(-dy)*k}px)`;
-  if(pb)pb.style.transform=`translateY(${dy*k}px)`;
-}
-function animateBeam(to){
-  cancelAnimationFrame(scaleAnim);
-  const from=scaleAngle,t0=performance.now(),D=600;
-  const step=now=>{const p=Math.min(1,(now-t0)/D),e=1-Math.pow(1-p,3);scaleAngle=from+(to-from)*e;drawBeam(scaleAngle);if(p<1)scaleAnim=requestAnimationFrame(step)};
-  scaleAnim=requestAnimationFrame(step);
-}
-function chipHTML(t){
-  const col=t.owner==='a'||t.owner==='b'?S.people[t.owner].color:t.owner==='none'?'var(--line)':'var(--both)';
-  return `<div class="tchip" data-tid="${t.id}" style="border-left-color:${col}">${t.owner==='rotate'?'🔄 ':''}${esc(tt(t))}<b>${fmt(tw(t))}</b></div>`;
-}
-function renderScales(){
-  const P=S.people,L=load();
-  const own=k=>S.tasks.filter(t=>t.owner===k);
-  const shared=S.tasks.filter(t=>t.owner==='both'||t.owner==='rotate');
-  const sh=shared.reduce((s,t)=>s+tw(t),0)/2;
-  const tot=L.a+L.b, diff=L.a-L.b;
-  const target=tot?Math.max(-16,Math.min(16,(L.b-L.a)/tot*40)):0;
-  let verdict=T('balanced');
-  if(tot&&Math.abs(diff)/tot>0.05)verdict=T('heavier',{x:diff>0?P.a.name:P.b.name,d:fmt(Math.abs(diff))})+` · ${Math.round(L.a/tot*100)}% / ${Math.round(L.b/tot*100)}%`;
-  const pan=(k,id)=>`<div class="pan" id="${id}" data-drop="${k}">
-      <div class="panHead"><span style="color:${P[k].color}">${esc(P[k].name)}</span><b>${fmt(L[k])}</b></div>
-      ${sh?`<div class="panSub">${T('inclShared',{s:fmt(sh)})}</div>`:''}
-      <div class="chips">${own(k).map(chipHTML).join('')||`<div class="dropHint">${T('dropHere')}</div>`}</div></div>`;
-  $('#tab-scales').innerHTML=`
-    <div class="card scales">
-      <div class="verdict">${esc(verdict)}</div>
-      <svg id="scaleSvg" viewBox="0 0 300 136" aria-hidden="true"></svg>
-      <div class="pans">${pan('a','panA')}${pan('b','panB')}</div>
-    </div>
-    ${poolsHTML()}
-    <div class="hint">${T('scalesHint')}</div>`;
-  drawBeam(scaleAngle);
-  animateBeam(target);
-  bindQuick();
-}
-function poolsHTML(){
-  const shared=S.tasks.filter(t=>t.owner==='both'||t.owner==='rotate'), none=S.tasks.filter(t=>t.owner==='none');
-  const hint=`<div class="dropHint">${T('dropHere')}</div>`;
-  return `<div class="card pool" data-drop="both"><h3>${T('sharedPool')}</h3>
-      <div class="chips">${shared.map(chipHTML).join('')||hint}</div></div>
-    <div class="card pool basket" data-drop="none"><h3>${T('basket')}</h3>
-      <form id="quickAdd" class="quick"><input type="text" name="q" placeholder="${T('quickPh')}" autocomplete="off"><button class="btn pri">${T('addShort')}</button></form>
-      <div class="chips">${none.map(chipHTML).join('')||hint}</div></div>`;
-}
-function bindQuick(){
-  $('#quickAdd').onsubmit=e=>{e.preventDefault();const v=e.target.q.value.trim();if(!v)return;
-    S.tasks.push({id:uid(),title:v,zone:S.zones[S.zones.length-1]||'',owner:'none',next:C.me,freq:'weekly',effort:1,lastDone:null,lastBy:null,note:''});save();
-    setTimeout(()=>$('#quickAdd input')?.focus(),0)};
-}
-function renderBags(){
-  const P=S.people,L=load(),mx=Math.max(L.a,L.b,1),tot=L.a+L.b;
-  const own=k=>S.tasks.filter(t=>t.owner===k);
-  let mood=T('bagsEven');
-  if(tot){const d=Math.abs(L.a-L.b)/tot,x=L.a>L.b?P.a.name:P.b.name;if(d>0.25)mood=T('bagsMuch',{x});else if(d>0.08)mood=T('bagsMore',{x})}
-  const sack=k=>{const fill=Math.round(12+78*(L[k]/mx));return `<div class="sackWrap">
-      <svg class="tie" viewBox="0 0 60 26" aria-hidden="true"><path d="M8 22 Q30 8 52 22" /><path d="M24 14 q-10 -12 -16 -6 q4 6 16 6 M36 14 q10 -12 16 -6 q-4 6 -16 6"/></svg>
-      <div class="sack" data-drop="${k}" style="--c:${P[k].color};--fill:${fill}%">
-        <div class="sackFill"></div>
-        <div class="sackHead"><b style="color:${P[k].color}">${esc(P[k].name)}</b><span>${T('bagsCount',{n:own(k).length})}</span></div>
-        <div class="chips">${own(k).map(chipHTML).join('')||`<div class="dropHint">${T('dropHere')}</div>`}</div>
-      </div></div>`};
-  $('#tab-bags').innerHTML=`
-    <div class="card bags">
-      <div class="verdict mood">${esc(mood)}</div>
-      <div class="sacks">${sack('a')}${sack('b')}</div>
-    </div>
-    ${poolsHTML()}
-    <div class="hint">${T('bagsHint')}</div>`;
-  bindQuick();
-}
-window.addEventListener('resize',()=>{if(UI.tab==='scales')drawBeam(scaleAngle)});
-
-/* pointer drag for chips (works with mouse and touch) */
+/* drag (mouse + touch) */
 let drag=null;
 document.addEventListener('pointerdown',e=>{
-  const c=e.target.closest('.tchip');if(!c||e.button>0)return;
+  const it=e.target.closest('.item');if(!it||e.target.closest('.x')||e.button>0)return;
   e.preventDefault();
-  drag={id:c.dataset.tid,el:c,x:e.clientX,y:e.clientY,moved:false,ghost:null,over:null};
-  c.setPointerCapture(e.pointerId);
+  drag={id:it.dataset.id,el:it,x:e.clientX,y:e.clientY,moved:false};
+  it.setPointerCapture(e.pointerId);
 });
 document.addEventListener('pointermove',e=>{
   if(!drag)return;
-  if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<6)return;
   if(!drag.moved){
+    if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<6)return;
     drag.moved=true;const r=drag.el.getBoundingClientRect();
+    drag.ox=drag.x-r.left;drag.oy=drag.y-r.top;
     drag.ghost=drag.el.cloneNode(true);drag.ghost.classList.add('ghost');drag.ghost.style.width=r.width+'px';
-    drag.ox=drag.x-r.left;drag.oy=drag.y-r.top;document.body.appendChild(drag.ghost);drag.el.classList.add('dragging');
+    drag.ghost.style.setProperty('--c',getComputedStyle(drag.el).getPropertyValue('--c'));
+    document.body.appendChild(drag.ghost);drag.el.classList.add('dragging');
+    drag.ph=document.createElement('div');drag.ph.className='placeholder';
   }
-  const edge=60;if(e.clientY<edge)window.scrollBy(0,-12);else if(e.clientY>innerHeight-edge)window.scrollBy(0,12);
   drag.ghost.style.left=(e.clientX-drag.ox)+'px';drag.ghost.style.top=(e.clientY-drag.oy)+'px';
-  const under=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-drop]');
-  if(under!==drag.over){drag.over?.classList.remove('over');under?.classList.add('over');drag.over=under}
+  if(e.clientY<60)scrollBy(0,-10);else if(e.clientY>innerHeight-60)scrollBy(0,10);
+  const col=document.elementFromPoint(e.clientX,e.clientY)?.closest('.col');
+  document.querySelectorAll('.col.over').forEach(c=>c!==col&&c.classList.remove('over'));
+  if(!col){drag.ph.remove();drag.to=null;return}
+  col.classList.add('over');
+  const list=col.querySelector('.list');
+  const items=[...list.querySelectorAll('.item:not(.dragging)')];
+  const before=items.find(i=>{const r=i.getBoundingClientRect();return e.clientY<r.top+r.height/2});
+  before?list.insertBefore(drag.ph,before):list.appendChild(drag.ph);
+  drag.to={k:col.dataset.k,beforeId:before?.dataset.id||null};
 });
-function endDrag(e,cancel){
+function endDrag(cancel){
   if(!drag)return;const d=drag;drag=null;
-  d.ghost?.remove();d.el.classList.remove('dragging');d.over?.classList.remove('over');
-  if(cancel)return;
-  if(!d.moved){openTask(d.id);return}
-  if(!d.over)return;
-  const t=S.tasks.find(x=>x.id===d.id);const k=d.over.dataset.drop;
-  const nk=k==='both'?(t.owner==='rotate'||t.owner==='both'?t.owner:'both'):k;
-  if(nk!==t.owner){t.owner=nk;save()}
+  d.ghost?.remove();d.ph?.remove();d.el.classList.remove('dragging');
+  document.querySelectorAll('.col.over').forEach(c=>c.classList.remove('over'));
+  if(cancel||!d.moved||!d.to)return;
+  let item;['a','b'].forEach(k=>{const i=S[k].findIndex(x=>x.id===d.id);if(i>-1)item=S[k].splice(i,1)[0]});
+  const L=S[d.to.k],i=d.to.beforeId?L.findIndex(x=>x.id===d.to.beforeId):-1;
+  i>-1?L.splice(i,0,item):L.push(item);
+  save();
 }
-document.addEventListener('pointerup',e=>endDrag(e,false));
-document.addEventListener('pointercancel',e=>endDrag(e,true));
+document.addEventListener('pointerup',()=>endDrag(false));
+document.addEventListener('pointercancel',()=>endDrag(true));
 
-/* ---------- task dialog ---------- */
-function openTask(id){
-  const P=S.people;
-  const t=id?S.tasks.find(x=>x.id===id):{title:'',zone:S.zones[0]||'',owner:C.me,freq:'weekly',effort:1,note:''};
-  const st={owner:t.owner,freq:t.freq,effort:t.effort};
-  const f=$('#form');
-  const seg=(name,opts,val)=>`<div class="seg" data-seg="${name}">${opts.map(([k,l])=>`<button type="button" data-v="${k}" class="${String(val)===String(k)?'on':''}">${esc(l)}</button>`).join('')}</div>`;
-  f.innerHTML=`<h2>${id?T('edit'):T('newTask')}</h2>
-    <label class="f">${T('what')}</label><input type="text" name="title" value="${esc(id?tt(t):'')}" required placeholder="${T('whatPh')}">
-    <label class="f">${T('zone')}</label><select name="zone">${S.zones.map(z=>`<option value="${esc(z)}" ${z===t.zone?'selected':''}>${esc(zl(z))}</option>`).join('')}</select>
-    <label class="f">${T('who')}</label>${seg('owner',[['a',P.a.name],['b',P.b.name],['both',T('both')],['rotate',T('rotate')],['none',T('nobody')]],st.owner)}
-    <label class="f">${T('often')}</label>${seg('freq',Object.keys(FREQ).map(k=>[k,fl(k)]),st.freq)}
-    <label class="f">${T('hard')}</label>${seg('effort',[[1,T('e1')],[2,T('e2')],[3,T('e3')]],st.effort)}
-    <label class="f">${T('note')}</label><textarea name="note" placeholder="${T('notePh')}">${esc(t.note)}</textarea>
-    <div class="btns">${id?`<button type="button" class="btn del" id="delTask">${T('del')}</button>`:''}<span class="spacer"></span>
-      <button type="button" class="btn" id="cancel">${T('cancel')}</button><button class="btn pri" value="ok">${T('save')}</button></div>`;
-  f.querySelectorAll('[data-seg]').forEach(g=>g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');st[g.dataset.seg]=g.dataset.seg==='effort'?+b.dataset.v:b.dataset.v});
-  $('#cancel').onclick=()=>$('#dlg').close();
-  if(id)$('#delTask').onclick=()=>{if(confirm(T('delQ'))){S.tasks=S.tasks.filter(x=>x.id!==id);$('#dlg').close();save()}};
-  f.onsubmit=e=>{
-    const fd=new FormData(f);const title=fd.get('title').trim();if(!title){e.preventDefault();return}
-    const data={title,zone:fd.get('zone'),note:fd.get('note').trim(),...st};
-    if(id){if(t.sk&&title!==tt(t))delete t.sk;Object.assign(t,data)}
-    else S.tasks.push({id:uid(),next:C.me,lastDone:null,lastBy:null,...data});
-    save();
-  };
-  $('#dlg').showModal();
-}
-
-/* ---------- actions ---------- */
-function markDone(id,btn){
-  const t=S.tasks.find(x=>x.id===id);if(!t)return;
-  const by=C.me;
-  t.lastDone=Date.now();t.lastBy=by;
-  if(t.owner==='rotate')t.next=by==='a'?'b':'a';
-  S.log.push({taskId:id,by,ts:t.lastDone});
-  if(S.log.length>500)S.log=S.log.slice(-500);
-  btn.classList.add('flash');
-  toast(T('wellDone',{x:S.people[by].name}));
-  setTimeout(save,350);
-}
-function cycleOwner(id){
-  const order=['a','b','both','rotate'];const t=S.tasks.find(x=>x.id===id);
-  t.owner=order[(order.indexOf(t.owner)+1)%order.length];save();
-}
-function saveZones(){
-  const nz=$('#zones').value.split('\n').map(s=>s.trim()).filter(Boolean);
-  S.tasks.forEach(t=>{const m=nz.find(z=>z===t.zone||z===zl(t.zone));if(m)t.zone=m});
-  S.zones=nz;save();toast(T('zonesSaved'));
-}
-
-document.addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b)return;
-  const d=b.dataset;
-  if(d.tab){UI.tab=d.tab;render()}
-  else if(d.lang){C.lang=d.lang;ls.set(CFG_KEY,C);render()}
-  else if(d.filter){UI.filter=d.filter;render()}
-  else if(d.group){UI.group=d.group;render()}
-  else if(d.done)markDone(d.done,b);
-  else if(d.cycle)cycleOwner(d.cycle);
-  else if(d.edit)openTask(d.edit);
-  else if(d.me){C.me=d.me;ls.set(CFG_KEY,C);render()}
-  else if(d.themeSet){C.theme=d.themeSet;ls.set(CFG_KEY,C);applyTheme();render()}
-  else if(b.id==='addBtn')openTask(null);
-  else if(b.id==='saveZones')saveZones();
-  else if(b.id==='gistSave'){readGistCfg();pushGist(true)}
-  else if(b.id==='gistLoad'){readGistCfg();pullGist(true)}
-  else if(b.id==='exp'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));a.download='domovik.json';a.click()}
-  else if(b.id==='imp'){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=async()=>{try{const d=JSON.parse(await i.files[0].text());if(d.tasks){S=d;save();toast(T('imported'))}}catch(err){toast(T('badFile'))}};i.click()}
-  else if(b.id==='reset'){if(confirm(T('resetQ'))){S=seed();save()}}
-});
-document.addEventListener('change',e=>{
-  const d=e.target.dataset;
-  if(d.pname){S.people[d.pname].name=e.target.value.trim()||S.people[d.pname].name;save()}
-  if(d.pcolor){S.people[d.pcolor].color=e.target.value;save()}
-});
-
-/* ---------- gist sync ---------- */
-function readGistCfg(){C.token=$('#token').value.trim();C.gist=$('#gist').value.trim();ls.set(CFG_KEY,C)}
-function setSync(t){$('#syncState').textContent=t}
-const gh=(path,opt={})=>fetch('https://api.github.com'+path,{...opt,headers:{'Authorization':'Bearer '+C.token,'Accept':'application/vnd.github+json',...(opt.body?{'Content-Type':'application/json'}:{})}});
-let syncT=null;
-function scheduleSync(){if(!C.token||!C.gist)return;clearTimeout(syncT);setSync('…');syncT=setTimeout(()=>pushGist(false),1500)}
-async function pushGist(manual){
-  if(!C.token){toast(T('needToken'));return}
+/* settings: language + gist sync */
+$('#cfgBtn').onclick=()=>{
+  $('#cfgForm').innerHTML=`<h2>${T('settings')}</h2>
+    <label>${T('lang')}</label>
+    <div class="seg"><button type="button" class="btn ${C.lang==='be'?'on':''}" data-lang="be">Беларуская</button><button type="button" class="btn ${C.lang==='uk'?'on':''}" data-lang="uk">Українська</button></div>
+    <label>${T('tokenLbl')}</label><input type="password" id="token" value="${esc(C.token)}" placeholder="ghp_...">
+    <label>Gist ID</label><input id="gist" value="${esc(C.gist)}" placeholder="${T('gistPh')}">
+    <div class="btns"><button type="button" class="btn pri" id="push">${C.gist?T('save'):T('create')}</button><button type="button" class="btn" id="pull">${T('load')}</button><button class="btn">${T('close')}</button></div>
+    <div class="status" id="cfgStatus"></div>
+    <div class="small">${T('syncHint')}</div>`;
+  $('#cfgForm').querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{C.lang=b.dataset.lang;ls.set(CFG,C);render();$('#cfg').close();$('#cfgBtn').click()});
+  const read=()=>{C.token=$('#token').value.trim();C.gist=$('#gist').value.trim();ls.set(CFG,C)};
+  const st=(m,ok)=>{const e=$('#cfgStatus');e.textContent=m;e.className='status '+(ok?'ok':'bad')};
+  $('#push').onclick=async()=>{read();if(!C.token)return st(T('needToken'));const was=!!C.gist;st(T('busy'),1);
+    const r=await push();if(r===true){$('#gist').value=C.gist;$('#push').textContent=T('save');st(was?T('saved'):T('created'),1)}else st(r)};
+  $('#pull').onclick=async()=>{read();if(!C.token)return st(T('needToken'));if(!C.gist)return st(T('needGist'));st(T('busy'),1);
+    const r=await pull(true);st(r===true?T('loaded'):r,r===true)};
+  $('#cfg').showModal();
+};
+const gh=(p,o={})=>fetch('https://api.github.com'+p,{...o,headers:{Authorization:'Bearer '+C.token,Accept:'application/vnd.github+json'}});
+let t;function scheduleSync(){if(!C.token||!C.gist)return;clearTimeout(t);$('#syncState').textContent='…';t=setTimeout(push,1200)}
+function errMsg(e){return e===401||e===403?T('badToken'):e===404?T('notFound'):typeof e==='number'?T('err')+' '+e:T('offline')}
+async function push(){
+  if(!C.token)return T('needToken');
   try{
-    const body=JSON.stringify({description:'Дамавік / Домовик',public:false,files:{[GIST_FILE]:{content:JSON.stringify(S)}}});
+    const body=JSON.stringify({description:'Дамавік',public:false,files:{[FILE]:{content:JSON.stringify(S)}}});
     const r=C.gist?await gh('/gists/'+C.gist,{method:'PATCH',body}):await gh('/gists',{method:'POST',body});
-    if(!r.ok)throw new Error(r.status);
-    const j=await r.json();
-    if(!C.gist){C.gist=j.id;ls.set(CFG_KEY,C);if(UI.tab==='settings')render()}
-    setSync(T('synced'));if(manual)toast(T('savedGist'));
-  }catch(err){setSync(T('noSync'));if(manual)toast(T('gistErr')+err.message)}
+    if(!r.ok)throw r.status;const j=await r.json();if(!C.gist){C.gist=j.id;ls.set(CFG,C)}
+    $('#syncState').textContent=T('synced');return true;
+  }catch(e){$('#syncState').textContent=T('noSync');return errMsg(e)}
 }
-async function pullGist(manual){
+async function pull(force){
   if(!C.token||!C.gist)return;
   try{
-    setSync('…');
-    const r=await gh('/gists/'+C.gist+'?t='+Date.now());if(!r.ok)throw new Error(r.status);
-    const j=await r.json();const f=j.files[GIST_FILE];if(!f)throw new Error(T('noFile'));
-    const txt=f.truncated?await (await fetch(f.raw_url)).text():f.content;
-    const d=JSON.parse(txt);
-    if(manual||!S.updated||d.updated>=S.updated){S=d;ls.set(STORE_KEY,S);render()}
-    else pushGist(false);
-    setSync(T('synced'));if(manual)toast(T('loaded'));
-  }catch(err){setSync(T('noSync'));if(manual)toast(T('gistErr')+err.message)}
+    const r=await gh('/gists/'+C.gist+'?t='+Date.now());if(!r.ok)throw r.status;
+    const f=(await r.json()).files[FILE];if(!f)throw 404;
+    const d=normalize(JSON.parse(f.truncated?await (await fetch(f.raw_url)).text():f.content));
+    if(force||d.updated>=(S.updated||0)){S=d;ls.set(KEY,S);render()}else push();
+    $('#syncState').textContent=T('synced');return true;
+  }catch(e){$('#syncState').textContent=T('noSync');return errMsg(e)}
 }
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullGist(false)});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
 
-applyTheme();render();pullGist(false);
-setInterval(render,60000);
+render();pull();
 </script>
 </body>
 </html>
