@@ -45,6 +45,23 @@ dialog input{width:100%;padding:9px 11px;border:1px solid var(--line);border-rad
 .btn.on,.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .status{font-size:13px;margin-top:10px;min-height:1em}.status.ok{color:var(--b)}.status.bad{color:#d9534f}
+.paper{margin:28px 0 24px;background:#fffef8;color:#2b2622;border:1px solid #e3dccb;border-radius:4px;padding:26px 22px;box-shadow:0 2px 14px rgba(0,0,0,.07);font-family:Georgia,"Times New Roman",serif;font-size:14.5px;line-height:1.5}
+.paper h2{text-align:center;font-size:17px;letter-spacing:.06em;margin:0}
+.paper .sub{text-align:center;font-style:italic;margin:2px 0 14px}
+.paper .meta{display:flex;justify-content:space-between;font-size:13px;color:#6d655c;margin-bottom:14px}
+.paper p{margin:8px 0}
+.paper ol{margin:4px 0 4px 6px;padding-left:18px}
+.paper .none{color:#9a9088;font-style:italic}
+.paper input.term{font:inherit;border:0;border-bottom:1px dashed #a49a8c;background:none;color:inherit;padding:0 2px;width:15em;max-width:100%}
+.paper input.term:focus{outline:none;border-bottom-style:solid}
+.sigs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:18px}
+.sig .lbl{font-size:12px;color:#6d655c;margin-top:4px}
+.sig canvas,.sig img{display:block;width:100%;height:90px;border-bottom:1.5px solid #2b2622;touch-action:none;cursor:crosshair}
+.sig canvas{background:repeating-linear-gradient(transparent 0 88px,transparent 88px)}
+.sig .row{display:flex;justify-content:space-between;align-items:center}
+.sig button{border:0;background:none;color:#9a9088;font:12px system-ui;cursor:pointer;padding:2px}
+.stamp{text-align:center;font-size:12px;color:#b04a3a;margin-top:12px;font-family:system-ui;letter-spacing:.04em}
+@media (prefers-color-scheme: dark){.paper{filter:brightness(.92)}}
 .small{font-size:12px;color:var(--muted);margin-top:10px}
 </style>
 </head>
@@ -57,6 +74,7 @@ dialog input{width:100%;padding:9px 11px;border:1px solid var(--line);border-rad
   </header>
   <div class="cols" id="cols"></div>
   <div class="hint" id="hint"></div>
+  <div class="paper" id="contract"></div>
 </div>
 
 <dialog id="cfg"><form method="dialog" id="cfgForm"></form></dialog>
@@ -68,13 +86,31 @@ const I18N={
    needToken:'Спачатку ўвядзі token',needGist:'Увядзі Gist ID або націсні «Стварыць gist»',busy:'Чакай…',created:'✓ Gist створаны',saved:'✓ Захавана',loaded:'✓ Загружана',err:'Памылка',badToken:'Токен не падышоў (401). Правер, што ў яго ёсць права gist',notFound:'Gist не знойдзены (404). Правер ID',offline:'Няма сувязі з GitHub',
    syncHint:'Каб бачыць адны і тыя ж спісы на двух тэлефонах, увядзіце той жа token і Gist ID.',synced:'✓',noSync:'⚠ няма сінхры',
    seedA:['Вынесці смецце','Пыласос','Памыць ванну','Аплаціць рахункі','Развесіць бялізну'],
-   seedB:['Памыць посуд','Выцерці пыл','Запусціць пральку','Паліць кветкі','Закупка прадуктаў'],nameB:'Яна'},
+   seedB:['Памыць посуд','Выцерці пыл','Запусціць пральку','Паліць кветкі','Закупка прадуктаў'],nameB:'Світланка',
+   c:{title:'ДАМОВА № 1',sub:'аб справядлівым падзеле хатніх абавязкаў',city:'г. Прага',
+    pre:'{A}, далей «Бок 1», і {B}, далей «Бок 2», знаходзячыся ў здаровым розуме і нармальным настроі, дамовіліся пра наступнае:',
+    p1:'<b>1. Прадмет.</b> Бакі падтрымліваюць дом у стане, калі не сорамна раптоўна запрасіць госця. Ці маму.',
+    p2:'<b>2. Бок 1 ({A}) абавязаны:</b>',p3:'<b>3. Бок 2 ({B}) абавязана:</b>',empty:'нічога (падазрона)',
+    p4:'<b>4. Адказнасць.</b> За кожны невыкананы абавязак вінаваты Бок адбывае пакаранне:',pA:'Бок 1:',pB:'Бок 2:',tbd:'яшчэ прыдумваецца…',
+    p5:'<b>5. Форс-мажор:</b> хвароба, камандзіроўка, дэдлайн і серыял, які нельга спыніць на сярэдзіне. Апошняе працуе не часцей за раз на тыдзень.',
+    p6:'<b>6. Спрэчкі</b> вырашаюцца перамовамі, абдымкамі або падкідваннем манеткі.',
+    p7:'<b>7.</b> Перацягванне справы ў іншы спіс лічыцца дадаткам да Дамовы і падпісваецца аўтаматычна.',
+    sign:'Подпіс',clear:'сцерці',signHere:'распішыся тут пальцам ці мышкай',stamp:'⚖ ДАМОВА ПАДПІСАНА АБОДВУМА БАКАМІ ⚖'}},
  uk:{app:'Напалам',hint:'Перетягуй справи між списками. Натисни на ім\'я, щоб змінити.',addPh:'+ додати справу',settings:'Налаштування',lang:'Мова',
    tokenLbl:'GitHub token (лише право gist)',gistPh:'порожньо = створити новий',save:'Зберегти в gist',create:'Створити gist',load:'Завантажити з gist',close:'Закрити',
    needToken:'Спочатку введи token',needGist:'Введи Gist ID або натисни «Створити gist»',busy:'Зачекай…',created:'✓ Gist створено',saved:'✓ Збережено',loaded:'✓ Завантажено',err:'Помилка',badToken:'Токен не підійшов (401). Перевір, що в нього є право gist',notFound:'Gist не знайдено (404). Перевір ID',offline:'Немає звʼязку з GitHub',
    syncHint:'Щоб бачити ті самі списки на двох телефонах, введіть той самий token і Gist ID.',synced:'✓',noSync:'⚠ немає синхронізації',
    seedA:['Винести сміття','Пилосос','Помити ванну','Оплатити рахунки','Розвісити білизну'],
-   seedB:['Помити посуд','Витерти пил','Запустити пральку','Полити квіти','Закупівля продуктів'],nameB:'Вона'}
+   seedB:['Помити посуд','Витерти пил','Запустити пральку','Полити квіти','Закупівля продуктів'],nameB:'Світланка',
+   c:{title:'ДОГОВІР № 1',sub:'про справедливий поділ хатніх обовʼязків',city:'м. Прага',
+    pre:'{A}, далі «Сторона 1», і {B}, далі «Сторона 2», перебуваючи при здоровому глузді й нормальному настрої, домовилися про таке:',
+    p1:'<b>1. Предмет.</b> Сторони підтримують дім у стані, коли не соромно раптово запросити гостя. Або маму.',
+    p2:'<b>2. Сторона 1 ({A}) зобовʼязана:</b>',p3:'<b>3. Сторона 2 ({B}) зобовʼязана:</b>',empty:'нічого (підозріло)',
+    p4:'<b>4. Відповідальність.</b> За кожен невиконаний обовʼязок винна Сторона відбуває покарання:',pA:'Сторона 1:',pB:'Сторона 2:',tbd:'ще вигадується…',
+    p5:'<b>5. Форс-мажор:</b> хвороба, відрядження, дедлайн і серіал, який не можна зупинити на середині. Останнє діє не частіше ніж раз на тиждень.',
+    p6:'<b>6. Суперечки</b> вирішуються переговорами, обіймами або підкиданням монетки.',
+    p7:'<b>7.</b> Перетягування справи в інший список вважається додатком до Договору й підписується автоматично.',
+    sign:'Підпис',clear:'стерти',signHere:'розпишись тут пальцем чи мишкою',stamp:'⚖ ДОГОВІР ПІДПИСАНО ОБОМА СТОРОНАМИ ⚖'}}
 };
 const KEY='domovik-v2',CFG='domovik-cfg',FILE='domovik.json';
 const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
@@ -95,7 +131,8 @@ function normalize(d){
   }
   return seed();
 }
-let S=normalize(ls.get(KEY));
+function ensure(d){d.sig=d.sig||{};d.terms=d.terms||{a:'20 анжуманяў',b:''};return d}
+let S=ensure(normalize(ls.get(KEY)));
 
 function save(){S.updated=Date.now();ls.set(KEY,S);render();scheduleSync()}
 
@@ -107,6 +144,38 @@ function render(){
       <div class="list">${S[k].map(it=>`<div class="item" data-id="${it.id}"><span class="t">${esc(it.t)}</span><button class="x" data-del="${it.id}" aria-label="delete">×</button></div>`).join('')}</div>
       <form class="add" data-add="${k}"><input name="q" placeholder="${T('addPh')}" autocomplete="off"></form>
     </div>`).join('');
+  renderContract();
+}
+function renderContract(){
+  const c=T('c'),A=esc(S.names.a),B=esc(S.names.b),fill=x=>x.replace(/\{A\}/g,A).replace(/\{B\}/g,B);
+  const list=k=>S[k].length?`<ol>${S[k].map(i=>`<li>${esc(i.t)}</li>`).join('')}</ol>`:`<p class="none">${c.empty}</p>`;
+  const dates=['a','b'].map(k=>S.sig[k]?.at).filter(Boolean);
+  const M={be:['студзеня','лютага','сакавіка','красавіка','мая','чэрвеня','ліпеня','жніўня','верасня','кастрычніка','лістапада','снежня'],uk:['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня']}[C.lang];
+  const dt=new Date(dates.length?Math.min(...dates):Date.now()),d=`${dt.getDate()} ${M[dt.getMonth()]} ${dt.getFullYear()}`;
+  const short=t=>{const x=new Date(t);return [x.getDate(),x.getMonth()+1].map(n=>String(n).padStart(2,'0')).join('.')+'.'+x.getFullYear()};
+  const sig=k=>`<div class="sig">${S.sig[k]?.img?`<img src="${S.sig[k].img}" alt="">`:`<canvas data-sig="${k}" title="${c.signHere}"></canvas>`}
+      <div class="row"><span class="lbl">${c.sign}: ${k==='a'?A:B}${S.sig[k]?.at?' · '+short(S.sig[k].at):''}</span>
+      ${S.sig[k]?.img?`<button data-unsign="${k}">${c.clear}</button>`:`<span class="lbl">✍</span>`}</div></div>`;
+  $('#contract').innerHTML=`<h2>${c.title}</h2><div class="sub">${c.sub}</div>
+    <div class="meta"><span>${c.city}</span><span>${d}</span></div>
+    <p>${fill(c.pre)}</p><p>${c.p1}</p>
+    <p>${fill(c.p2)}</p>${list('a')}<p>${fill(c.p3)}</p>${list('b')}
+    <p>${c.p4}<br>${c.pA} <input class="term" data-term="a" value="${esc(S.terms.a)}"><br>${c.pB} <input class="term" data-term="b" value="${esc(S.terms.b)}" placeholder="${c.tbd}"></p>
+    <p>${c.p5}</p><p>${c.p6}</p><p>${c.p7}</p>
+    <div class="sigs">${sig('a')}${sig('b')}</div>
+    ${S.sig.a?.img&&S.sig.b?.img?`<div class="stamp">${c.stamp}</div>`:''}`;
+  document.querySelectorAll('canvas[data-sig]').forEach(setupPad);
+}
+function setupPad(cv){
+  const r=cv.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);
+  cv.width=r.width*dpr;cv.height=r.height*dpr;
+  const g=cv.getContext('2d');g.scale(dpr,dpr);g.lineWidth=2.2;g.lineCap='round';g.lineJoin='round';g.strokeStyle='#1f3a8a';
+  let drawing=false,inked=false,last;
+  const pt=e=>{const b=cv.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
+  cv.onpointerdown=e=>{e.preventDefault();clearTimeout(cv._t);cv.setPointerCapture(e.pointerId);drawing=true;last=pt(e)};
+  cv.onpointermove=e=>{if(!drawing)return;const p=pt(e);g.beginPath();g.moveTo(...last);g.lineTo(...p);g.stroke();last=p;inked=true};
+  cv.onpointerup=cv.onpointercancel=()=>{if(!drawing)return;drawing=false;if(!inked)return;
+    clearTimeout(cv._t);cv._t=setTimeout(()=>{S.sig[cv.dataset.sig]={img:cv.toDataURL('image/png'),at:Date.now()};save()},900)};
 }
 
 /* edits */
@@ -115,7 +184,9 @@ document.addEventListener('submit',e=>{
   const v=e.target.q.value.trim();if(!v)return;
   S[k].push({id:uid(),t:v});save();$(`[data-add="${k}"] input`).focus();
 });
-document.addEventListener('change',e=>{const k=e.target.dataset.name;if(k){S.names[k]=e.target.value.trim()||S.names[k];save()}});
+document.addEventListener('change',e=>{const k=e.target.dataset.name;if(k){S.names[k]=e.target.value.trim()||S.names[k];save()}
+  const t=e.target.dataset.term;if(t){S.terms[t]=e.target.value.trim();save()}});
+document.addEventListener('click',e=>{const k=e.target.dataset.unsign;if(k){delete S.sig[k];save()}});
 document.addEventListener('click',e=>{
   const id=e.target.dataset.del;if(!id)return;
   ['a','b'].forEach(k=>S[k]=S[k].filter(x=>x.id!==id));save();
@@ -201,7 +272,7 @@ async function pull(force){
   try{
     const r=await gh('/gists/'+C.gist+'?t='+Date.now());if(!r.ok)throw r.status;
     const f=(await r.json()).files[FILE];if(!f)throw 404;
-    const d=normalize(JSON.parse(f.truncated?await (await fetch(f.raw_url)).text():f.content));
+    const d=ensure(normalize(JSON.parse(f.truncated?await (await fetch(f.raw_url)).text():f.content)));
     if(force||d.updated>=(S.updated||0)){S=d;ls.set(KEY,S);render()}else push();
     $('#syncState').textContent=T('synced');return true;
   }catch(e){$('#syncState').textContent=T('noSync');return errMsg(e)}
