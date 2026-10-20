@@ -15,6 +15,7 @@ button,input{font:inherit;color:inherit}
 header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 h1{font-size:22px;margin:0;flex:1}
 .sync{font-size:12px;color:var(--muted)}
+.icon.on{background:var(--ink)}
 .icon{border:0;background:var(--chip);border-radius:10px;width:36px;height:36px;font-size:17px;cursor:pointer}
 .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}
 .col{min-width:0;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:10px;min-height:200px;transition:border-color .15s,background .15s}
@@ -45,7 +46,10 @@ dialog input{width:100%;padding:9px 11px;border:1px solid var(--line);border-rad
 .btn.on,.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .status{font-size:13px;margin-top:10px;min-height:1em}.status.ok{color:var(--b)}.status.bad{color:#d9534f}
-.paper{margin:28px 0 24px;background:#fffef8;color:#2b2622;border:1px solid #e3dccb;border-radius:4px;padding:26px 22px;box-shadow:0 2px 14px rgba(0,0,0,.07);font-family:Georgia,"Times New Roman",serif;font-size:14.5px;line-height:1.5}
+.tabs{display:flex;gap:4px;background:var(--chip);padding:4px;border-radius:12px;margin-bottom:14px}
+.tabs button{flex:1;border:0;background:none;padding:8px;border-radius:9px;color:var(--muted);cursor:pointer;font-size:14px}
+.tabs button.on{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.paper{margin:0 0 24px;background:#fffef8;color:#2b2622;border:1px solid #e3dccb;border-radius:4px;padding:26px 22px;box-shadow:0 2px 14px rgba(0,0,0,.07);font-family:Georgia,"Times New Roman",serif;font-size:14.5px;line-height:1.5}
 .paper h2{text-align:center;font-size:17px;letter-spacing:.06em;margin:0}
 .paper .sub{text-align:center;font-style:italic;margin:2px 0 14px}
 .paper .meta{display:flex;justify-content:space-between;font-size:13px;color:#6d655c;margin-bottom:14px}
@@ -70,18 +74,17 @@ dialog input{width:100%;padding:9px 11px;border:1px solid var(--line);border-rad
   <header>
     <h1>🏠 <span id="appName"></span></h1>
     <span class="sync" id="syncState"></span>
-    <button class="icon" id="cfgBtn">⚙️</button>
+    <button class="icon" id="docBtn"></button><button class="icon" id="cfgBtn">⚙️</button>
   </header>
-  <div class="cols" id="cols"></div>
-  <div class="hint" id="hint"></div>
-  <div class="paper" id="contract"></div>
+  <div id="pane-lists"><div class="cols" id="cols"></div><div class="hint" id="hint"></div></div>
+  <div class="paper" id="contract" hidden></div>
 </div>
 
 <dialog id="cfg"><form method="dialog" id="cfgForm"></form></dialog>
 
 <script>
 const I18N={
- be:{app:'Напалам',hint:'Перацягвай справы паміж спісамі. Націсні на імя, каб змяніць.',addPh:'+ дадаць справу',settings:'Налады',lang:'Мова',
+ be:{app:'Напалам',tabLists:'Спісы',tabContract:'Дамова',hint:'Перацягвай справы паміж спісамі. Націсні на імя, каб змяніць.',addPh:'+ дадаць справу',settings:'Налады',lang:'Мова',
    tokenLbl:'GitHub token (толькі права gist)',gistPh:'пуста = стварыць новы',save:'Захаваць у gist',create:'Стварыць gist',load:'Загрузіць з gist',close:'Закрыць',
    needToken:'Спачатку ўвядзі token',needGist:'Увядзі Gist ID або націсні «Стварыць gist»',busy:'Чакай…',created:'✓ Gist створаны',saved:'✓ Захавана',loaded:'✓ Загружана',err:'Памылка',badToken:'Токен не падышоў (401). Правер, што ў яго ёсць права gist',notFound:'Gist не знойдзены (404). Правер ID',offline:'Няма сувязі з GitHub',
    syncHint:'Каб бачыць адны і тыя ж спісы на двух тэлефонах, увядзіце той жа token і Gist ID.',synced:'✓',noSync:'⚠ няма сінхры',
@@ -96,7 +99,7 @@ const I18N={
     p6:'<b>6. Спрэчкі</b> вырашаюцца перамовамі, абдымкамі або падкідваннем манеткі.',
     p7:'<b>7.</b> Перацягванне справы ў іншы спіс лічыцца дадаткам да Дамовы і падпісваецца аўтаматычна.',
     sign:'Подпіс',clear:'сцерці',signHere:'распішыся тут пальцам ці мышкай',stamp:'⚖ ДАМОВА ПАДПІСАНА АБОДВУМА БАКАМІ ⚖'}},
- uk:{app:'Напалам',hint:'Перетягуй справи між списками. Натисни на ім\'я, щоб змінити.',addPh:'+ додати справу',settings:'Налаштування',lang:'Мова',
+ uk:{app:'Напалам',tabLists:'Списки',tabContract:'Договір',hint:'Перетягуй справи між списками. Натисни на ім\'я, щоб змінити.',addPh:'+ додати справу',settings:'Налаштування',lang:'Мова',
    tokenLbl:'GitHub token (лише право gist)',gistPh:'порожньо = створити новий',save:'Зберегти в gist',create:'Створити gist',load:'Завантажити з gist',close:'Закрити',
    needToken:'Спочатку введи token',needGist:'Введи Gist ID або натисни «Створити gist»',busy:'Зачекай…',created:'✓ Gist створено',saved:'✓ Збережено',loaded:'✓ Завантажено',err:'Помилка',badToken:'Токен не підійшов (401). Перевір, що в нього є право gist',notFound:'Gist не знайдено (404). Перевір ID',offline:'Немає звʼязку з GitHub',
    syncHint:'Щоб бачити ті самі списки на двох телефонах, введіть той самий token і Gist ID.',synced:'✓',noSync:'⚠ немає синхронізації',
@@ -144,8 +147,12 @@ function render(){
       <div class="list">${S[k].map(it=>`<div class="item" data-id="${it.id}"><span class="t">${esc(it.t)}</span><button class="x" data-del="${it.id}" aria-label="delete">×</button></div>`).join('')}</div>
       <form class="add" data-add="${k}"><input name="q" placeholder="${T('addPh')}" autocomplete="off"></form>
     </div>`).join('');
-  renderContract();
+  let tab=window.__tab;if(!tab){try{tab=sessionStorage.getItem('napalam-tab')}catch(e){}}tab=tab||'lists';
+  const db=$('#docBtn');db.textContent=tab==='contract'?'📋':'📜';db.title=T(tab==='contract'?'tabLists':'tabContract');db.classList.toggle('on',tab==='contract');
+  $('#pane-lists').hidden=tab!=='lists';$('#contract').hidden=tab!=='contract';
+  if(tab==='contract')renderContract();
 }
+$('#docBtn').onclick=()=>{const t=$('#contract').hidden?'contract':'lists';window.__tab=t;try{sessionStorage.setItem('napalam-tab',t)}catch(err){};render();scrollTo(0,0)};
 function renderContract(){
   const c=T('c'),A=esc(S.names.a),B=esc(S.names.b),fill=x=>x.replace(/\{A\}/g,A).replace(/\{B\}/g,B);
   const list=k=>S[k].length?`<ol>${S[k].map(i=>`<li>${esc(i.t)}</li>`).join('')}</ol>`:`<p class="none">${c.empty}</p>`;
